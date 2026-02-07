@@ -8,7 +8,10 @@ import lombok.*;
         @Index(name = "idx_username", columnList = "username"),
         @Index(name = "idx_email", columnList = "username")
 })
-@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
 public class User {
     @Id
