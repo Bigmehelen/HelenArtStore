@@ -2,6 +2,10 @@ package com.helenartstore.HelenArtStore.data.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -27,4 +31,18 @@ public class User {
     private String firstName;
     @Column(name = "last_name", length = 50)
     private String lastName;
+    @Column(name = "profile_picture_url", length = 255)
+    private String profilePictureUrl;
+    @Column(name = "phone_number", length = 20)
+    private String phoneNumber;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    @Builder.Default
+    private Role role = Role.USER;
+//    @CreationTimestamp
+//    @Column(name = "created_at", nullable = false, updatable = false)
+//    private LocalDateTime createdAt;
+//    @UpdateTimestamp
+//    @Column(name = "updated_at")
+//    private LocalDateTime updatedAt;
 }
