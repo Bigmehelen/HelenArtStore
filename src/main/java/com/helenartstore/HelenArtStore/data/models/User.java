@@ -39,10 +39,16 @@ public class User {
     @Column(nullable = false)
     @Builder.Default
     private Role role = Role.USER;
-//    @CreationTimestamp
-//    @Column(name = "created_at", nullable = false, updatable = false)
-//    private LocalDateTime createdAt;
-//    @UpdateTimestamp
-//    @Column(name = "updated_at")
-//    private LocalDateTime updatedAt;
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean enabled = true;
+    @Column(name = "account_non_expired")
+    @Builder.Default
+    private Boolean accountNonExpired = true;
+    @Column(name = "account_non_locked")
+    @Builder.Default
+    private Boolean accountNonLocked = true;
+    @Column(name = "credentials_non_expired")
+    @Builder.Default
+    private Boolean credentialsNonExpired = true;
 }
