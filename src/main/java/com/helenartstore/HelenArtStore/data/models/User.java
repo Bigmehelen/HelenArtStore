@@ -2,10 +2,6 @@ package com.helenartstore.HelenArtStore.data.models;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -38,7 +34,7 @@ public class User {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     @Builder.Default
-    private Role role = Role.USER;
+    private Role role;
     @Column(nullable = false)
     @Builder.Default
     private Boolean enabled = true;
