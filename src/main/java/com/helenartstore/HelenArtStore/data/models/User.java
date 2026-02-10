@@ -13,6 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -33,18 +34,13 @@ public class User {
     private String phoneNumber;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
     private Role role;
     @Column(nullable = false)
-    @Builder.Default
     private Boolean enabled = true;
     @Column(name = "account_non_expired")
-    @Builder.Default
     private Boolean accountNonExpired = true;
     @Column(name = "account_non_locked")
-    @Builder.Default
     private Boolean accountNonLocked = true;
     @Column(name = "credentials_non_expired")
-    @Builder.Default
     private Boolean credentialsNonExpired = true;
 }
