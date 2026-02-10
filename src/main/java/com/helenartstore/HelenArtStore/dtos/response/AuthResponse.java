@@ -12,4 +12,5 @@ public record AuthResponse(
 ) {
     public AuthResponse(String token, Long id, String username, String email, Role role) {
         this(token, "Bearer", id, username, email, role);
+    }
 }

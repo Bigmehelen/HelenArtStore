@@ -4,10 +4,12 @@ import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.data.repository.UserRepository;
 import com.helenartstore.HelenArtStore.dtos.response.UserResponse;
 import com.helenartstore.HelenArtStore.exceptions.UserNotFoundException;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Service
 public class UserService {
 
     private UserRepository userRepository;

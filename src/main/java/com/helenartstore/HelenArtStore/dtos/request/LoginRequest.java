@@ -1,6 +1,7 @@
 package com.helenartstore.HelenArtStore.dtos.request;
 
 import jakarta.validation.constraints.NotBlank;
+import lombok.Data;
 
 public record LoginRequest(
         @NotBlank(message = "Email is required")

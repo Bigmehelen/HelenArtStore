@@ -1,11 +1,11 @@
 package com.helenartstore.HelenArtStore.repository;
+
 import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.data.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Optional;
 
@@ -28,6 +28,7 @@ public class UserRepositoryTest {
         user.setPassword("password123");
         userRepository.deleteAll();
     }
+
     @Test
     public void testThatUserCanBeAdded() {
         User saved = userRepository.save(user);

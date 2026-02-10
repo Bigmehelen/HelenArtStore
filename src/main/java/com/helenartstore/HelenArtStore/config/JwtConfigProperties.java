@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConfigurationProperties(prefix = "jwt")
-@Data
+//@Data
 public class JwtConfigProperties {
     private String secret;
     private long expiration;
