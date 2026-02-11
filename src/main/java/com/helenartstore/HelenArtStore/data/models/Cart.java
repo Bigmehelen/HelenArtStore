@@ -2,6 +2,7 @@ package com.helenartstore.HelenArtStore.data.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -27,7 +28,7 @@ public class Cart {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "cart_id", nullable = false)
+    @JoinColumn(name = "artworks_id", nullable = false)
     private Artworks artworks;
     @Column(nullable = false)
     private LocalDateTime startTime;
@@ -36,20 +37,15 @@ public class Cart {
     private LocalDateTime actualStartTime;
     private LocalDateTime actualEndTime;
     private LocalDateTime actualExitTime;
-    // @Enumerated(EnumType.STRING)
-    // @Column(nullable = false)
-    // @Builder.Default
-    // private CartStatus status = CartStatus.CREATED;
-    // @Column(nullable = false)
-    // private Double baseAmount;
-    // @Builder.Default
-    // private Double extraAmount = 0.0;
-    // @Column(nullable = false)
-    // private Double totalAmount;
-    // @CreationTimestamp
-    // @Column(name = "created_at", nullable = false, updatable = false)
-    // private LocalDateTime createdAt;
-    // @Version
-    // private Long version;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private CartStatus status;
+    private Double extraAmount = 0.0;
+    @Column(nullable = false)
+    private Double totalAmount;
+    @CreationTimestamp
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
 
 }
