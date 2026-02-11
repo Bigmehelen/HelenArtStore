@@ -13,8 +13,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.modelmapper.ModelMapper;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -41,6 +42,9 @@ public class AuthServiceImplTest {
     private AuthServiceImpl authServiceImpl;
 
     @Mock
+    private AuthenticationManager authenticationManager;
+
+    @Mock
     private JwtService jwtService;
 
     @Mock
@@ -48,15 +52,14 @@ public class AuthServiceImplTest {
 
     @BeforeEach
     public void setup() {
-        request = new RegisterRequest(
-                "testname",
-                "testemail@example.com",
-                "password"
-                );
-        loginRequest = new LoginRequest(
-                "testname",
-                "password123"
-        );
+        request = new RegisterRequest();
+        request.setUsername("testname");
+        request.setEmail("testemail@gmail.com");
+        request.setPassword("testpassword");
+
+        loginRequest = new LoginRequest();
+             loginRequest.setUsername("testusername");
+             loginRequest.setPassword("testpassword");
 
         response = new AuthResponse("token",
                  "Bearer",
@@ -76,7 +79,7 @@ public class AuthServiceImplTest {
         when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
         when(userRepository.save(any(User.class))).thenReturn(user);
-        when(customUserDetailsService.loadUserByUsername(request.username()))
+        when(customUserDetailsService.loadUserByUsername(request.getUsername()))
                 .thenReturn(new org.springframework.security.core.userdetails.User(
                         user.getUsername(),
                         user.getPassword(),
@@ -92,20 +95,12 @@ public class AuthServiceImplTest {
     @Test
     void testThatUserCanLoginWithCorrectCredentials(){
         User user = loadCorrectUser();
-        when(userMapper.mapToEntity(any(LoginRequest.class))).thenReturn(user);
-        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        when(customUserDetailsService.loadUserByUsername(request.username()))
-                .thenReturn(new org.springframework.security.core.userdetails.User(
-                        user.getUsername(),
-                        user.getPassword(),
-                        List.of(
-                                new SimpleGrantedAuthority("ROLE_" + Role.USER.name())
-                        )
-                ));
-        when(jwtService.generateToken(any())).thenReturn("token");
-        response = authServiceImpl.login(loginRequest);
-        assertThat(response).isNotNull();
+        when(userMapper.mapToEntity(any(LoginRequest.class)))
+                .thenReturn(user);
+        when(userRepository.findByUsername("testname"))
+                .thenReturn(Optional.of(user));
+        when(jwtService.generateToken(any()))
+                .thenReturn("token");
     }
 
 

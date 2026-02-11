@@ -18,8 +18,6 @@ public class ApplicationConfig {
 
     private final UserDetailsService userDetailsService;
 
-//    private PasswordEncoder passwordEncoder;
-
     @Bean
     public AuthenticationProvider authenticationProvider(PasswordEncoder passwordEncoder) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
