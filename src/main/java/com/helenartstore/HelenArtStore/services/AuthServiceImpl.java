@@ -34,7 +34,7 @@ public class AuthServiceImpl implements AuthService {
         if(userRepository.findByUsername(request.username()).isPresent()){
             throw new UserAlreadyExistException("user with username already exist");
         }
-        User user = userMapper.INSTANCE.map(request);;
+        User user = userMapper.toEntity(request);
         user.setRole(Role.USER);
         User savedUser = userRepository.save(user);
         UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
@@ -51,6 +51,22 @@ public class AuthServiceImpl implements AuthService {
     }
     @Override
     public AuthResponse login(LoginRequest request) {
-        return null;
+        if(userRepository.findByUsername(request.username()).isPresent()){
+            throw new UserAlreadyExistException("user with username already exist");
+        }
+        User user = userMapper.mapToEntity(request);
+        user.setRole(Role.USER);
+        User savedUser = userRepository.save(user);
+        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        String jwt = jwtService.generateToken(userDetails);
+        return new AuthResponse(
+                jwt,
+                "Bearer",
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                savedUser.getRole()
+        );
+
     }
 }

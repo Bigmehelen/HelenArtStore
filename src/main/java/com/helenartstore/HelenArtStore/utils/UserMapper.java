@@ -1,14 +1,25 @@
 package com.helenartstore.HelenArtStore.utils;
 
 import com.helenartstore.HelenArtStore.data.models.User;
+import com.helenartstore.HelenArtStore.dtos.request.LoginRequest;
 import com.helenartstore.HelenArtStore.dtos.request.RegisterRequest;
-import org.mapstruct.Mapper;
-import org.mapstruct.factory.Mappers;
+import org.modelmapper.ModelMapper;
+import org.springframework.stereotype.Component;
 
-@Mapper
-public interface UserMapper {
-    UserMapper INSTANCE = Mappers.getMapper(UserMapper.class);
+@Component
+public class UserMapper {
 
-    User map(RegisterRequest request);
-    RegisterRequest toDto(User user);
+    private final ModelMapper modelMapper;
+
+    public UserMapper(ModelMapper modelMapper) {
+        this.modelMapper = modelMapper;
+    }
+
+    public User toEntity(RegisterRequest request) {
+        return modelMapper.map(request, User.class);
+    }
+
+    public User mapToEntity(LoginRequest request) {
+        return modelMapper.map(request, User.class);
+    }
 }
