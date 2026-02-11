@@ -2,6 +2,12 @@ package com.helenartstore.HelenArtStore.data.models;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -14,7 +20,7 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 @ToString
-public class User {
+public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -43,4 +49,9 @@ public class User {
     private Boolean accountNonLocked = true;
     @Column(name = "credentials_non_expired")
     private Boolean credentialsNonExpired = true;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+    }
 }
