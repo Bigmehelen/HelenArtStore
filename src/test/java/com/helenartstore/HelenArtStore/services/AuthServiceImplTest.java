@@ -14,8 +14,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -58,7 +60,7 @@ public class AuthServiceImplTest {
         request.setPassword("testpassword");
 
         loginRequest = new LoginRequest();
-             loginRequest.setUsername("testusername");
+             loginRequest.setUsername("testname");
              loginRequest.setPassword("testpassword");
 
         response = new AuthResponse("token",
@@ -93,18 +95,36 @@ public class AuthServiceImplTest {
     }
 
     @Test
-    void testThatUserCanLoginWithCorrectCredentials(){
+    void testThatUserCanLoginWithCorrectCredentials() {
+
         User user = loadCorrectUser();
-        when(userMapper.mapToEntity(any(LoginRequest.class)))
-                .thenReturn(user);
-        when(userRepository.findByUsername("testname"))
-                .thenReturn(Optional.of(user));
-        when(jwtService.generateToken(any()))
-                .thenReturn("token");
+//        when(userMapper.mapToEntity(any(LoginRequest.class))).thenReturn(user);
+//        when(userRepository.findByUsername(user.getUsername()))
+//                .thenReturn(Optional.of(user));
+
+        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenReturn(new UsernamePasswordAuthenticationToken(
+                        user.getUsername(),
+                        user.getPassword()
+                ));
+
+        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
+                user.getUsername(),
+                user.getPassword(),
+                List.of(new SimpleGrantedAuthority("ROLE_USER"))
+        );
+        when(customUserDetailsService.loadUserByUsername(user.getUsername()))
+                .thenReturn(userDetails);
+
+        when(jwtService.generateToken(userDetails)).thenReturn("login-token");
+
+        AuthResponse response = authServiceImpl.login(loginRequest);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getToken()).isEqualTo("login-token");
+
+        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
     }
-
-
-
 
 
 

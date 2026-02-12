@@ -6,14 +6,12 @@ import com.helenartstore.HelenArtStore.data.repository.UserRepository;
 import com.helenartstore.HelenArtStore.dtos.request.LoginRequest;
 import com.helenartstore.HelenArtStore.dtos.request.RegisterRequest;
 import com.helenartstore.HelenArtStore.dtos.response.AuthResponse;
-import com.helenartstore.HelenArtStore.exceptions.InvalidCredentialsException;
 import com.helenartstore.HelenArtStore.exceptions.UserAlreadyExistException;
 import com.helenartstore.HelenArtStore.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +22,7 @@ public class AuthServiceImpl implements AuthService {
     private UserRepository userRepository;
 
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private CustomUserDetailsService customUserDetailsService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -50,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
         User user = userMapper.toEntity(request);
         user.setRole(Role.USER);
         User savedUser = userRepository.save(user);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(user.getUsername());
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getUsername());
         String jwt = jwtService.generateToken(userDetails);
 
         return new AuthResponse(
@@ -64,9 +62,26 @@ public class AuthServiceImpl implements AuthService {
     }
 
     @Override
-    public AuthResponse login(LoginRequest request) {
-        return null;
-    }
+    public AuthResponse login(LoginRequest loginRequest) {
 
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        loginRequest.getUsername(),
+                        loginRequest.getPassword()
+                )
+        );
+
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(
+                loginRequest.getUsername()
+        );
+
+        String token = jwtService.generateToken(userDetails);
+
+        AuthResponse response = new AuthResponse();
+        response.setToken(token);
+        response.setUsername(userDetails.getUsername());
+
+        return response;
+    }
 
 }
