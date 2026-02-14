@@ -40,7 +40,7 @@ public class Cart {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private CartStatus status;
-    private Double extraAmount = 0.0;
+    private Double extraAmount;
     @Column(nullable = false)
     private Double totalAmount;
     @CreationTimestamp

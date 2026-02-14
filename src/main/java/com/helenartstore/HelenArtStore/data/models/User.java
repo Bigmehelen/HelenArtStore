@@ -14,12 +14,12 @@ import java.util.List;
         @Index(name = "idx_username", columnList = "username"),
         @Index(name = "idx_email", columnList = "username")
 })
+@ToString
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@ToString
 public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,7 +40,8 @@ public class User implements UserDetails {
     private String phoneNumber;
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private Role role;
+    @Builder.Default
+    private Role role = Role.USER;
     @Column(nullable = false)
     private Boolean enabled = true;
     @Column(name = "account_non_expired")

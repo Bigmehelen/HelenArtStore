@@ -16,6 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
@@ -47,8 +48,9 @@ public class AuthServiceImpl implements AuthService {
         }
         User user = userMapper.toEntity(request);
         user.setRole(Role.USER);
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getUsername());
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getUsername());
         String jwt = jwtService.generateToken(userDetails);
 
         return new AuthResponse(

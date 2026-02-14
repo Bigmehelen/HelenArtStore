@@ -98,10 +98,6 @@ public class AuthServiceImplTest {
     void testThatUserCanLoginWithCorrectCredentials() {
 
         User user = loadCorrectUser();
-//        when(userMapper.mapToEntity(any(LoginRequest.class))).thenReturn(user);
-//        when(userRepository.findByUsername(user.getUsername()))
-//                .thenReturn(Optional.of(user));
-
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(new UsernamePasswordAuthenticationToken(
                         user.getUsername(),
