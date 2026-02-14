@@ -1,6 +1,7 @@
 package com.helenartstore.HelenArtStore.data.repository;
 
 import com.helenartstore.HelenArtStore.data.models.Artworks;
+import com.helenartstore.HelenArtStore.dtos.response.AvailableArtworksProjection;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
