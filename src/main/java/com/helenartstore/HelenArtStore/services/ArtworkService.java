@@ -13,5 +13,5 @@ public interface ArtworkService {
     ArtworkResponse updateArtwork(Long id, UpdateArtwork update);
     void deleteArtwork(Long id);
     List<ArtworkResponse> getAllArtworks();
-    List<ArtworkResponse> getAllArtworksByName(String name);
+    List<ArtworkResponse> getArtworksByName(String name);
 }

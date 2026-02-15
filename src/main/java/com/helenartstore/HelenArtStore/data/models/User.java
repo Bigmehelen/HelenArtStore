@@ -43,12 +43,16 @@ public class User implements UserDetails {
     @Builder.Default
     private Role role = Role.USER;
     @Column(nullable = false)
+    @Builder.Default
     private Boolean enabled = true;
     @Column(name = "account_non_expired")
+    @Builder.Default
     private Boolean accountNonExpired = true;
     @Column(name = "account_non_locked")
+    @Builder.Default
     private Boolean accountNonLocked = true;
     @Column(name = "credentials_non_expired")
+    @Builder.Default
     private Boolean credentialsNonExpired = true;
 
     @Override
