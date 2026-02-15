@@ -17,6 +17,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -36,6 +37,9 @@ public class AuthServiceImplTest {
 
     @Mock
     private UserMapper userMapper;
+
+    @Mock
+    private PasswordEncoder passwordEncoder;
 
     @Mock
     private UserRepository userRepository;
@@ -80,6 +84,7 @@ public class AuthServiceImplTest {
                 .thenReturn(user);
         when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
         when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
+        when(passwordEncoder.encode(any(CharSequence.class))).thenReturn("encodedPassword");
         when(userRepository.save(any(User.class))).thenReturn(user);
         when(customUserDetailsService.loadUserByUsername(request.getUsername()))
                 .thenReturn(new org.springframework.security.core.userdetails.User(

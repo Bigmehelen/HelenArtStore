@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "artworks")
@@ -21,7 +22,7 @@ public class Artworks {
     private String name;
     private String description;
     private int quantity;
-    private String imageUrls;
+    private List<String> imageUrls;
     private BigDecimal price;
     private boolean isAvailable;
     @ManyToOne(fetch = FetchType.LAZY)
