@@ -19,14 +19,14 @@ public class CloudinaryService {
 
     public String uploadImage(MultipartFile file) {
         try {
-            Map uploadResult = cloudinary.uploader()
+            @SuppressWarnings("unchecked")
+            Map<String, Object> uploadResult = cloudinary.uploader()
                     .upload(file.getBytes(), ObjectUtils.emptyMap());
 
             return uploadResult.get("secure_url").toString();
 
-        } catch (IOException e) {
-            throw new RuntimeException("Image upload failed", e);
+        } catch (IOException exception) {
+            throw new RuntimeException("Image upload failed", exception);
         }
     }
 }
-

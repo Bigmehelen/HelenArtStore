@@ -22,7 +22,8 @@ public class Artworks {
     private String name;
     private String description;
     private int quantity;
-    private List<String> imageUrls;
+    @ElementCollection
+    private List<String> imagesUrls;
     private BigDecimal price;
     private boolean isAvailable;
     @ManyToOne(fetch = FetchType.LAZY)
