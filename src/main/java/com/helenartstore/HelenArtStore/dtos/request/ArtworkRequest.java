@@ -6,8 +6,10 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Data
 public class ArtworkRequest {
@@ -18,7 +20,7 @@ public class ArtworkRequest {
     @NotBlank(message = "Quantity is required")
     private int quantity;
     @NotBlank(message = "Image is required")
-    private String imageUrls;
+    private List<MultipartFile> images;
     @NotBlank(message = "price is required")
     private BigDecimal price;
     private boolean isAvailable;
