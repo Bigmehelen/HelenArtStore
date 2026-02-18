@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ExtendWith(MockitoExtension.class)
-class ArtworkControllerTest {
+public class ArtworkControllerTest {
 
     @Mock
     private ArtworkService artworkService;
@@ -87,7 +87,7 @@ class ArtworkControllerTest {
         when(artworkService.updateArtwork(eq(1L), any(UpdateArtwork.class))).thenReturn(updatedResponse);
 
         mockMvc.perform(multipart("/api/v1/artworks/{id}", 1L)
-                .file(image)
+                        .file(image)
                 .param("name", "Moremi Updated")
                 .with(request -> {
                     request.setMethod("PATCH");

@@ -33,218 +33,205 @@ import static org.mockito.Mockito.*;
 @ActiveProfiles("test")
 public class ArtworkServiceImplTest {
 
-        private ArtworkRequest artworkRequest;
-        private User artistUser;
-        private User regularUser;
-        private Artworks savedArtwork;
+    private ArtworkRequest artworkRequest;
+    private User artistUser;
+    private User regularUser;
+    private Artworks savedArtwork;
 
-        @Mock
-        private ArtworksRepository artworksRepository;
+    @Mock
+    private ArtworksRepository artworksRepository;
 
-        @Mock
-        private UserRepository userRepository;
+    @Mock
+    private UserRepository userRepository;
 
-        @Mock
-        private CloudinaryService cloudinaryService;
+    @Mock
+    private CloudinaryService cloudinaryService;
 
-        @Mock
-        private ArtworkMapper artworkMapper;
+    @Mock
+    private ArtworkMapper artworkMapper;
 
-        @InjectMocks
-        private ArtworkServiceImpl artworkService;
+    @InjectMocks
+    private ArtworkServiceImpl artworkService;
 
-        @BeforeEach
-        void setUp() {
-                // Setup artist user
-                artistUser = User.builder()
-                                .id(1L)
-                                .username("artist_user")
-                                .email("artist@example.com")
-                                .role(Role.ARTIST)
-                                .build();
+    @BeforeEach
+    void setUp() {
+        artistUser = User.builder()
+                .id(1L)
+                .username("artist_user")
+                .email("artist@example.com")
+                .role(Role.ARTIST)
+                .build();
 
-                // Setup regular user (non-artist)
-                regularUser = User.builder()
-                                .id(2L)
-                                .username("regular_user")
-                                .email("user@example.com")
-                                .role(Role.USER)
-                                .build();
+        regularUser = User.builder()
+                .id(2L)
+                .username("regular_user")
+                .email("user@example.com")
+                .role(Role.USER)
+                .build();
 
-                // Setup artwork request
-                artworkRequest = new ArtworkRequest();
-                artworkRequest.setName("Moremi");
-                artworkRequest.setDescription("Artwork set");
-                artworkRequest.setQuantity(3);
-                artworkRequest.setAvailable(true);
-                artworkRequest.setPrice(BigDecimal.valueOf(4000));
-                artworkRequest.setArtistId(1L);
+        artworkRequest = new ArtworkRequest();
+        artworkRequest.setName("Moremi");
+        artworkRequest.setDescription("Artwork set");
+        artworkRequest.setQuantity(3);
+        artworkRequest.setAvailable(true);
+        artworkRequest.setPrice(BigDecimal.valueOf(4000));
+        artworkRequest.setArtistId(1L);
 
-                MockMultipartFile image1 = new MockMultipartFile(
-                                "images",
-                                "image1.jpg",
-                                "image/jpeg",
-                                "dummy image content".getBytes());
+        MockMultipartFile image1 = new MockMultipartFile(
+                "images",
+                "image1.jpg",
+                "image/jpeg",
+                "dummy image content".getBytes());
 
-                MockMultipartFile image2 = new MockMultipartFile(
-                                "images",
-                                "image2.jpg",
-                                "image/jpeg",
-                                "dummy image content".getBytes());
-                List<MultipartFile> images = List.of(image1, image2);
-                artworkRequest.setImagesUrls(images);
+        MockMultipartFile image2 = new MockMultipartFile(
+                "images",
+                "image2.jpg",
+                "image/jpeg",
+                "dummy image content".getBytes());
+        List<MultipartFile> images = List.of(image1, image2);
+        artworkRequest.setImagesUrls(images);
 
-                // Setup saved artwork
-                savedArtwork = new Artworks();
-                savedArtwork.setId(1L);
-                savedArtwork.setName("Moremi");
-                savedArtwork.setDescription("Artwork set");
-                savedArtwork.setQuantity(3);
-                savedArtwork.setAvailable(true);
-                savedArtwork.setPrice(BigDecimal.valueOf(4000));
-                savedArtwork.setImagesUrls(List.of("url1", "url2"));
-                savedArtwork.setArtist(artistUser);
+        savedArtwork = new Artworks();
+        savedArtwork.setId(1L);
+        savedArtwork.setName("Moremi");
+        savedArtwork.setDescription("Artwork set");
+        savedArtwork.setQuantity(3);
+        savedArtwork.setAvailable(true);
+        savedArtwork.setPrice(BigDecimal.valueOf(4000));
+        savedArtwork.setImagesUrls(List.of("url1", "url2"));
+        savedArtwork.setArtist(artistUser);
 
-                // Setup expected response
-                ArtworkResponse response = new ArtworkResponse();
-                response.setId(1L);
-                response.setName("Moremi");
-                response.setDescription("Artwork set");
-                response.setQuantity(3);
-                response.setPrice(BigDecimal.valueOf(4000));
-                response.setAvailable(true);
-                response.setImageUrls(List.of("url1", "url2"));
-                response.setArtistId(1L);
-                response.setArtistName("artist_user");
-        }
+        ArtworkResponse response = new ArtworkResponse();
+        response.setId(1L);
+        response.setName("Moremi");
+        response.setDescription("Artwork set");
+        response.setQuantity(3);
+        response.setPrice(BigDecimal.valueOf(4000));
+        response.setAvailable(true);
+        response.setImageUrls(List.of("url1", "url2"));
+        response.setArtistId(1L);
+        response.setArtistName("artist_user");
+    }
 
-        @Test
-        void testThatCanCreateArtwork() {
+    @Test
+    void testThatCanCreateArtwork() {
 
-                when(userRepository.findById(1L)).thenReturn(Optional.of(artistUser));
-                when(cloudinaryService.uploadImage(any(MultipartFile.class)))
-                                .thenReturn("url1")
-                                .thenReturn("url2");
-                when(artworkMapper.toEntity(any(ArtworkRequest.class))).thenReturn(savedArtwork);
-                when(artworksRepository.save(any(Artworks.class))).thenReturn(savedArtwork);
-                when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
-                        {
-                                setId(1L);
-                                setName("Moremi");
-                                setDescription("Artwork set");
-                                setQuantity(3);
-                                setPrice(BigDecimal.valueOf(4000));
-                                setAvailable(true);
-                                setImageUrls(List.of("url1", "url2"));
-                                setArtistId(1L);
-                                setArtistName("artist_user");
-                        }
-                });
+        when(userRepository.findById(1L)).thenReturn(Optional.of(artistUser));
+        when(cloudinaryService.uploadImage(any(MultipartFile.class)))
+                .thenReturn("url1")
+                .thenReturn("url2");
+        when(artworkMapper.toEntity(any(ArtworkRequest.class))).thenReturn(savedArtwork);
+        when(artworksRepository.save(any(Artworks.class))).thenReturn(savedArtwork);
+        when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
+            {
+                setId(1L);
+                setName("Moremi");
+                setDescription("Artwork set");
+                setQuantity(3);
+                setPrice(BigDecimal.valueOf(4000));
+                setAvailable(true);
+                setImageUrls(List.of("url1", "url2"));
+                setArtistId(1L);
+                setArtistName("artist_user");
+            }
+        });
 
-                // Act
-                ArtworkResponse response = artworkService.createArtwork(artworkRequest);
+        ArtworkResponse response = artworkService.createArtwork(artworkRequest);
 
-                // Assert
-                assertNotNull(response);
-                assertEquals(1L, response.getId());
-                assertEquals("Moremi", response.getName());
-                assertEquals("Artwork set", response.getDescription());
-                assertEquals(3, response.getQuantity());
-                assertEquals(BigDecimal.valueOf(4000), response.getPrice());
-                assertTrue(response.isAvailable());
-                assertEquals(2, response.getImageUrls().size());
-                assertEquals("url1", response.getImageUrls().get(0));
-                assertEquals("url2", response.getImageUrls().get(1));
-                assertEquals(1L, response.getArtistId());
-                assertEquals("artist_user", response.getArtistName());
+        assertNotNull(response);
+        assertEquals(1L, response.getId());
+        assertEquals("Moremi", response.getName());
+        assertEquals("Artwork set", response.getDescription());
+        assertEquals(3, response.getQuantity());
+        assertEquals(BigDecimal.valueOf(4000), response.getPrice());
+        assertTrue(response.isAvailable());
+        assertEquals(2, response.getImageUrls().size());
+        assertEquals("url1", response.getImageUrls().get(0));
+        assertEquals("url2", response.getImageUrls().get(1));
+        assertEquals(1L, response.getArtistId());
+        assertEquals("artist_user", response.getArtistName());
 
-                // Verify interactions
-                verify(userRepository, times(1)).findById(1L);
-                verify(cloudinaryService, times(2)).uploadImage(any(MultipartFile.class));
-                verify(artworkMapper, times(1)).toEntity(any(ArtworkRequest.class));
-                verify(artworksRepository, times(1)).save(any(Artworks.class));
-                verify(artworkMapper, times(1)).toResponse(any(Artworks.class));
-        }
 
-        @Test
-        void testThatNonArtistCannotCreateArtwork() {
-                // Arrange
-                artworkRequest.setArtistId(2L);
-                when(userRepository.findById(2L)).thenReturn(Optional.of(regularUser));
+        verify(userRepository, times(1)).findById(1L);
+        verify(cloudinaryService, times(2)).uploadImage(any(MultipartFile.class));
+        verify(artworkMapper, times(1)).toEntity(any(ArtworkRequest.class));
+        verify(artworksRepository, times(1)).save(any(Artworks.class));
+        verify(artworkMapper, times(1)).toResponse(any(Artworks.class));
+    }
 
-                // Act & Assert
-                UnauthorizedArtworkCreationException exception = assertThrows(
-                                UnauthorizedArtworkCreationException.class,
-                                () -> artworkService.createArtwork(artworkRequest));
+    @Test
+    void testThatNonArtistCannotCreateArtwork() {
+        artworkRequest.setArtistId(2L);
+        when(userRepository.findById(2L)).thenReturn(Optional.of(regularUser));
 
-                assertTrue(exception.getMessage().contains("not authorized to create artworks"));
-                assertTrue(exception.getMessage().contains("Only artists can create artworks"));
 
-                // Verify that cloudinary and repository save were never called
-                verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
-                verify(artworksRepository, never()).save(any(Artworks.class));
-        }
+        UnauthorizedArtworkCreationException exception = assertThrows(
+                UnauthorizedArtworkCreationException.class,
+                () -> artworkService.createArtwork(artworkRequest));
 
-        @Test
-        void testThatArtworkCreationFailsWhenArtistNotFound() {
-                // Arrange
-                artworkRequest.setArtistId(999L);
-                when(userRepository.findById(999L)).thenReturn(Optional.empty());
+        assertTrue(exception.getMessage().contains("not authorized to create artworks"));
+        assertTrue(exception.getMessage().contains("Only artists can create artworks"));
 
-                // Act & Assert
-                ArtistNotFoundException exception = assertThrows(
-                                ArtistNotFoundException.class,
-                                () -> artworkService.createArtwork(artworkRequest));
+        verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
+        verify(artworksRepository, never()).save(any(Artworks.class));
+    }
 
-                assertTrue(exception.getMessage().contains("Artist with ID 999 not found"));
+    @Test
+    void testThatArtworkCreationFailsWhenArtistNotFound() {
+        artworkRequest.setArtistId(999L);
+        when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
-                // Verify that cloudinary and repository save were never called
-                verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
-                verify(artworksRepository, never()).save(any(Artworks.class));
-        }
+        ArtistNotFoundException exception = assertThrows(
+                ArtistNotFoundException.class,
+                () -> artworkService.createArtwork(artworkRequest));
 
-        @Test
-        void testThatCanUpdateArtwork() {
-                UpdateArtwork update = new UpdateArtwork();
-                update.setName("Moremi Remixed");
-                update.setPrice(BigDecimal.valueOf(5000));
+        assertTrue(exception.getMessage().contains("Artist with ID 999 not found"));
 
-                when(artworksRepository.findById(1L)).thenReturn(Optional.of(savedArtwork));
-                when(artworksRepository.save(any(Artworks.class))).thenReturn(savedArtwork);
-                when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
-                        {
-                                setId(1L);
-                                setName("Moremi Remixed");
-                                setPrice(BigDecimal.valueOf(5000));
-                        }
-                });
 
-                ArtworkResponse response = artworkService.updateArtwork(1L, update);
+        verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
+        verify(artworksRepository, never()).save(any(Artworks.class));
+    }
 
-                assertNotNull(response);
-                assertEquals("Moremi Remixed", response.getName());
-                assertEquals(BigDecimal.valueOf(5000), response.getPrice());
+    @Test
+    void testThatCanUpdateArtwork() {
+        UpdateArtwork update = new UpdateArtwork();
+        update.setName("Moremi Remixed");
+        update.setPrice(BigDecimal.valueOf(5000));
 
-                verify(artworksRepository, times(1)).save(any(Artworks.class));
-        }
+        when(artworksRepository.findById(1L)).thenReturn(Optional.of(savedArtwork));
+        when(artworksRepository.save(any(Artworks.class))).thenReturn(savedArtwork);
+        when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
+            {
+                setId(1L);
+                setName("Moremi Remixed");
+                setPrice(BigDecimal.valueOf(5000));
+            }
+        });
 
-        @Test
-        void testThatUpdateArtworkThrowsExceptionWhenNotFound() {
-                UpdateArtwork update = new UpdateArtwork();
-                when(artworksRepository.findById(99L)).thenReturn(Optional.empty());
+        ArtworkResponse response = artworkService.updateArtwork(1L, update);
+        assertNotNull(response);
+        assertEquals("Moremi Remixed", response.getName());
+        assertEquals(BigDecimal.valueOf(5000), response.getPrice());
 
-                assertThrows(RuntimeException.class, () -> artworkService.updateArtwork(99L, update));
-        }
+        verify(artworksRepository, times(1)).save(any(Artworks.class));
+    }
 
-        @Test
-        void testThatCanDeleteArtwork() {
-                when(artworksRepository.existsById(1L)).thenReturn(true);
-                doNothing().when(artworksRepository).deleteById(1L);
+    @Test
+    void testThatUpdateArtworkThrowsExceptionWhenNotFound() {
+        UpdateArtwork update = new UpdateArtwork();
+        when(artworksRepository.findById(99L)).thenReturn(Optional.empty());
 
-                artworkService.deleteArtwork(1L);
+        assertThrows(RuntimeException.class, () -> artworkService.updateArtwork(99L, update));
+    }
 
-                verify(artworksRepository, times(1)).deleteById(1L);
-        }
+    @Test
+    void testThatCanDeleteArtwork() {
+        when(artworksRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(artworksRepository).deleteById(1L);
+
+        artworkService.deleteArtwork(1L);
+        verify(artworksRepository, times(1)).deleteById(1L);
+    }
 
         @Test
         void testThatDeleteArtworkThrowsExceptionWhenNotFound() {
@@ -254,38 +241,38 @@ public class ArtworkServiceImplTest {
                 verify(artworksRepository, never()).deleteById(anyLong());
         }
 
-        @Test
-        void testThatCanGetAllArtworks() {
-                when(artworksRepository.findAll()).thenReturn(List.of(savedArtwork));
-                when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
-                        {
-                                setId(1L);
-                                setName("Moremi");
-                        }
-                });
+    @Test
+    void testThatCanGetAllArtworks() {
+        when(artworksRepository.findAll()).thenReturn(List.of(savedArtwork));
+        when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
+            {
+                setId(1L);
+                setName("Moremi");
+            }
+        });
 
-                List<ArtworkResponse> responses = artworkService.getAllArtworks();
+        List<ArtworkResponse> responses = artworkService.getAllArtworks();
 
-                assertNotNull(responses);
-                assertEquals(1, responses.size());
-                assertEquals("Moremi", responses.get(0).getName());
-        }
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
+        assertEquals("Moremi", responses.get(0).getName());
+    }
 
-        @Test
-        void testThatCanGetArtworksByName() {
-                when(artworksRepository.findByName("Moremi")).thenReturn(Optional.of(savedArtwork));
-                when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
-                        {
-                                setId(1L);
-                                setName("Moremi");
-                        }
-                });
+    @Test
+    void testThatCanGetArtworksByName() {
+        when(artworksRepository.findByName("Moremi")).thenReturn(Optional.of(savedArtwork));
+        when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
+            {
+                setId(1L);
+                setName("Moremi");
+            }
+        });
 
-                List<ArtworkResponse> responses = artworkService.getArtworksByName("Moremi");
+        List<ArtworkResponse> responses = artworkService.getArtworksByName("Moremi");
 
-                assertNotNull(responses);
-                assertEquals(1, responses.size());
-                assertEquals("Moremi", responses.get(0).getName());
-        }
+        assertNotNull(responses);
+        assertEquals(1, responses.size());
+        assertEquals("Moremi", responses.get(0).getName());
+    }
 
 }

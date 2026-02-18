@@ -16,7 +16,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-
 @Service
 public class AuthServiceImpl implements AuthService {
     @Autowired
@@ -37,13 +36,12 @@ public class AuthServiceImpl implements AuthService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-
     @Transactional
     public AuthResponse register(RegisterRequest request) {
-        if(userRepository.findByEmail(request.getEmail()).isPresent()){
+        if (userRepository.findByEmail(request.getEmail()).isPresent()) {
             throw new UserAlreadyExistException("user with email already exist");
         }
-        if(userRepository.findByUsername(request.getUsername()).isPresent()){
+        if (userRepository.findByUsername(request.getUsername()).isPresent()) {
             throw new UserAlreadyExistException("user with username already exist");
         }
         User user = userMapper.toEntity(request);
@@ -59,8 +57,7 @@ public class AuthServiceImpl implements AuthService {
                 savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getRole()
-        );
+                savedUser.getRole());
     }
 
     @Override
@@ -69,13 +66,10 @@ public class AuthServiceImpl implements AuthService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         loginRequest.getUsername(),
-                        loginRequest.getPassword()
-                )
-        );
+                        loginRequest.getPassword()));
 
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(
-                loginRequest.getUsername()
-        );
+                loginRequest.getUsername());
 
         String token = jwtService.generateToken(userDetails);
 
@@ -84,6 +78,36 @@ public class AuthServiceImpl implements AuthService {
         response.setUsername(userDetails.getUsername());
 
         return response;
+    }
+
+    @Override
+    @Transactional
+    public AuthResponse upgradeToArtist(String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getRole() == Role.ARTIST) {
+            throw new RuntimeException("User is already an artist");
+        }
+
+        user.setRole(Role.ARTIST);
+        User savedUser = userRepository.save(user);
+
+        // RefreshUserDetails to ensure new role is picked up if needed, though simpler
+        // to just generate new token with updated user entity
+        // Actually customUserDetailsService.loadUserByUsername pulls from DB, so it
+        // should get updated role
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getUsername());
+
+        String jwt = jwtService.generateToken(userDetails);
+
+        return new AuthResponse(
+                jwt,
+                "Bearer",
+                savedUser.getId(),
+                savedUser.getUsername(),
+                savedUser.getEmail(),
+                savedUser.getRole());
     }
 
 }

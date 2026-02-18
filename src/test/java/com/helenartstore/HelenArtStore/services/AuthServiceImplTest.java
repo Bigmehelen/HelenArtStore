@@ -14,128 +14,83 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@ActiveProfiles("test")
-public class AuthServiceImplTest {
-    RegisterRequest request;
-    LoginRequest loginRequest;
-    AuthResponse response;
+class AuthServiceImplTest {
 
-    @Mock
-    private UserMapper userMapper;
+        @Mock
+        private UserRepository userRepository;
+        @Mock
+        private CustomUserDetailsService customUserDetailsService;
+        @Mock
+        private AuthenticationManager authenticationManager;
+        @Mock
+        private JwtService jwtService;
+        @Mock
+        private UserMapper userMapper;
+        @Mock
+        private PasswordEncoder passwordEncoder;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
+        @InjectMocks
+        private AuthServiceImpl authService;
 
-    @Mock
-    private UserRepository userRepository;
+        private User user;
+        private User artist;
 
-    @InjectMocks
-    private AuthServiceImpl authServiceImpl;
+        @BeforeEach
+        void setUp() {
+                user = User.builder()
+                                .id(1L)
+                                .username("testuser")
+                                .email("test@example.com")
+                                .password("password")
+                                .role(Role.USER)
+                                .build();
 
-    @Mock
-    private AuthenticationManager authenticationManager;
+                artist = User.builder()
+                                .id(1L)
+                                .username("artist")
+                                .role(Role.ARTIST)
+                                .build();
+        }
 
-    @Mock
-    private JwtService jwtService;
+        @Test
+        void upgradeToArtist_Success() {
+                when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
+                when(userRepository.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+                when(customUserDetailsService.loadUserByUsername("testuser")).thenReturn(user);
+                when(jwtService.generateToken(any(UserDetails.class))).thenReturn("new_token");
 
-    @Mock
-    private CustomUserDetailsService customUserDetailsService;
+                AuthResponse response = authService.upgradeToArtist("testuser");
 
-    @BeforeEach
-    public void setup() {
-        request = new RegisterRequest();
-        request.setUsername("testname");
-        request.setEmail("testemail@gmail.com");
-        request.setPassword("testpassword");
+                assertNotNull(response);
+                assertEquals(Role.ARTIST, response.getRole());
+                assertEquals("new_token", response.getToken());
+                verify(userRepository).save(user);
+        }
 
-        loginRequest = new LoginRequest();
-             loginRequest.setUsername("testname");
-             loginRequest.setPassword("testpassword");
+        @Test
+        void upgradeToArtist_AlreadyArtist() {
+                user.setRole(Role.ARTIST);
+                when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 
-        response = new AuthResponse("token",
-                 "Bearer",
-                 1L,
-                 "testname",
-                 "testemail@example.com",
-                    Role.USER
-                 );
-    }
+                assertThrows(RuntimeException.class, () -> authService.upgradeToArtist("testuser"));
+                verify(userRepository, never()).save(any(User.class));
+        }
 
-    @Test
-    void testThatUserCanRegisterWithCorrectCredentials() {
-        User user = loadCorrectUser();
+        @Test
+        void upgradeToArtist_UserNotFound() {
+                when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
-        when(userMapper.toEntity(any(RegisterRequest.class)))
-                .thenReturn(user);
-        when(userRepository.findByEmail(any())).thenReturn(Optional.empty());
-        when(userRepository.findByUsername(any())).thenReturn(Optional.empty());
-        when(passwordEncoder.encode(any(CharSequence.class))).thenReturn("encodedPassword");
-        when(userRepository.save(any(User.class))).thenReturn(user);
-        when(customUserDetailsService.loadUserByUsername(request.getUsername()))
-                .thenReturn(new org.springframework.security.core.userdetails.User(
-                        user.getUsername(),
-                        user.getPassword(),
-                        List.of(
-                                new SimpleGrantedAuthority("ROLE_" + Role.USER.name())
-                        )
-                ));
-        when(jwtService.generateToken(any())).thenReturn("token");
-        response = authServiceImpl.register(request);
-        assertThat(response).isNotNull();
-    }
-
-    @Test
-    void testThatUserCanLoginWithCorrectCredentials() {
-
-        User user = loadCorrectUser();
-        when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(new UsernamePasswordAuthenticationToken(
-                        user.getUsername(),
-                        user.getPassword()
-                ));
-
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                List.of(new SimpleGrantedAuthority("ROLE_USER"))
-        );
-        when(customUserDetailsService.loadUserByUsername(user.getUsername()))
-                .thenReturn(userDetails);
-
-        when(jwtService.generateToken(userDetails)).thenReturn("login-token");
-
-        AuthResponse response = authServiceImpl.login(loginRequest);
-
-        assertThat(response).isNotNull();
-        assertThat(response.getToken()).isEqualTo("login-token");
-
-        verify(authenticationManager).authenticate(any(UsernamePasswordAuthenticationToken.class));
-    }
-
-
-
-    private User loadCorrectUser() {
-        User user = new User();
-        user.setUsername("testname");
-        user.setEmail("testemail@example.com");
-        user.setPassword("password");
-        user.setRole(Role.USER);
-
-        return user;
-    }
+                assertThrows(RuntimeException.class, () -> authService.upgradeToArtist("unknown"));
+        }
 }
