@@ -34,13 +34,6 @@ public class AuthController {
 
     @PostMapping("/become-artist")
     public ResponseEntity<AuthResponse> becomeArtist(org.springframework.security.core.Authentication authentication) {
-        // In a real scenario, we get the username from the SecurityContext
-        // We assume the user is authenticated via JWT filter before hitting this
-        // endpoint.
-        // However, standard Spring Security usage usually involves injecting
-        // Authentication or Principal.
-        // If the endpoint is secured, 'authentication' will be populated.
-
         String username = authentication != null ? authentication.getName() : null;
         AuthResponse response = authService.upgradeToArtist(username);
         return ResponseEntity.ok(response);

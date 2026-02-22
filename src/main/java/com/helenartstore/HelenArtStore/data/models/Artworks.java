@@ -18,7 +18,10 @@ import java.util.List;
 public class Artworks {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @org.springframework.lang.Nullable
     private Long id;
+    @Column(name = "artist_id")
+    private Long artistId;
     private String name;
     private String description;
     private int quantity;

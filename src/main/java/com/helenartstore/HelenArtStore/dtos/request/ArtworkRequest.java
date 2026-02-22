@@ -1,5 +1,6 @@
 package com.helenartstore.HelenArtStore.dtos.request;
 
+import com.helenartstore.HelenArtStore.data.models.Role;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -30,6 +31,5 @@ public class ArtworkRequest {
 
     private boolean isAvailable;
 
-    @NotNull(message = "Artist ID is required")
-    private Long artistId;
+    private Role role ;
 }

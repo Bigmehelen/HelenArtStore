@@ -31,15 +31,15 @@ public class ArtworkServiceImpl implements ArtworkService {
     private ArtworkMapper artworkMapper;
 
     @Override
-    public ArtworkResponse createArtwork(ArtworkRequest request) {
-
-        findAndValidateArtist(request);
+    public ArtworkResponse createArtwork(@org.springframework.lang.NonNull Long id, ArtworkRequest request) {
+        findAndValidateArtist(id);
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile image : request.getImagesUrls()) {
             String imageUrl = cloudinaryService.uploadImage(image);
             imageUrls.add(imageUrl);
         }
         Artworks artwork = artworkMapper.toEntity(request);
+        artwork.setArtistId(id);
         artwork.setRole(Role.ARTIST);
         Artworks savedArtwork = artworksRepository.save(artwork);
         return artworkMapper.toResponse(savedArtwork);
@@ -77,14 +77,14 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .toList();
     }
 
-    private void findAndValidateArtist(ArtworkRequest request) {
+    private void findAndValidateArtist(Long id) {
         @SuppressWarnings("null")
-        User artist = userRepository.findById(request.getArtistId())
+        User artist = userRepository.findById(id)
                 .orElseThrow(
-                        () -> new ArtistNotFoundException("Artist with id " + request.getArtistId() + " not found"));
+                        () -> new ArtistNotFoundException("Artist with ID " + id + " not found"));
 
         if (artist.getRole() != Role.ARTIST) {
-            throw new UnauthorizedArtworkCreationException("Artist not found");
+            throw new UnauthorizedArtworkCreationException("Only artists can create artworks");
         }
     }
 
