@@ -4,6 +4,7 @@ import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.data.repository.UserRepository;
 import com.helenartstore.HelenArtStore.dtos.response.UserResponse;
 import com.helenartstore.HelenArtStore.exceptions.UserNotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.stream.Collectors;
 @Service
 public class UserService {
 
+    @Autowired
     private UserRepository userRepository;
 
     public UserResponse getUserByUsername(String username) {
@@ -21,7 +23,8 @@ public class UserService {
         return mapToUserResponse(user);
     }
 
-    public UserResponse getUserById(Long id) {
+    public UserResponse getUserById(@org.springframework.lang.NonNull Long id) {
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException("User not found"));
 
@@ -41,7 +44,6 @@ public class UserService {
                 user.getEmail(),
                 user.getFirstName(),
                 user.getLastName(),
-                user.getRole()
-        );
+                user.getRole());
     }
 }

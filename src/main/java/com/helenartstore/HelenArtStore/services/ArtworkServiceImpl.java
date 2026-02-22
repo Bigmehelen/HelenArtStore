@@ -33,30 +33,30 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     public ArtworkResponse createArtwork(ArtworkRequest request) {
 
-        User artist = findAndValidateArtist(request.getArtistId());
-
+        findAndValidateArtist(request);
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile image : request.getImagesUrls()) {
             String imageUrl = cloudinaryService.uploadImage(image);
             imageUrls.add(imageUrl);
         }
         Artworks artwork = artworkMapper.toEntity(request);
-        artwork.setArtist(artist);
+        artwork.setRole(Role.ARTIST);
         Artworks savedArtwork = artworksRepository.save(artwork);
         return artworkMapper.toResponse(savedArtwork);
     }
 
     @Override
-    public ArtworkResponse updateArtwork(Long id, UpdateArtwork update) {
+    public ArtworkResponse updateArtwork(@org.springframework.lang.NonNull Long id, UpdateArtwork update) {
         Artworks artwork = findArtworkById(id);
         updateArtworkFields(artwork, update);
         updateArtworkImages(artwork, update.getImagesUrls());
+        @SuppressWarnings("null")
         Artworks updatedArtwork = artworksRepository.save(artwork);
         return artworkMapper.toResponse(updatedArtwork);
     }
 
     @Override
-    public void deleteArtwork(Long id) {
+    public void deleteArtwork(@org.springframework.lang.NonNull Long id) {
         if (!artworksRepository.existsById(id)) {
             throw new RuntimeException("Artwork with id " + id + " not found");
         }
@@ -71,30 +71,24 @@ public class ArtworkServiceImpl implements ArtworkService {
     }
 
     @Override
-    public List<ArtworkResponse> getArtworksByName(String name) {
+    public List<ArtworkResponse> getArtworksByName(@org.springframework.lang.NonNull String name) {
         return artworksRepository.findByName(name).stream()
                 .map(artworkMapper::toResponse)
                 .toList();
     }
 
-
-
-
-
-
-
-
-    private User findAndValidateArtist(Long artistId) {
-        User artist = userRepository.findById(artistId)
-                .orElseThrow(() -> new ArtistNotFoundException(artistId));
+    private void findAndValidateArtist(ArtworkRequest request) {
+        @SuppressWarnings("null")
+        User artist = userRepository.findById(request.getArtistId())
+                .orElseThrow(
+                        () -> new ArtistNotFoundException("Artist with id " + request.getArtistId() + " not found"));
 
         if (artist.getRole() != Role.ARTIST) {
-            throw new UnauthorizedArtworkCreationException(artist.getId());
+            throw new UnauthorizedArtworkCreationException("Artist not found");
         }
-        return artist;
     }
 
-    private Artworks findArtworkById(Long id) {
+    private Artworks findArtworkById(@org.springframework.lang.NonNull Long id) {
         return artworksRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Artwork with id " + id + " not found"));
     }

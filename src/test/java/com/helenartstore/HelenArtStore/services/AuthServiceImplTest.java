@@ -3,8 +3,6 @@ package com.helenartstore.HelenArtStore.services;
 import com.helenartstore.HelenArtStore.data.models.Role;
 import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.data.repository.UserRepository;
-import com.helenartstore.HelenArtStore.dtos.request.LoginRequest;
-import com.helenartstore.HelenArtStore.dtos.request.RegisterRequest;
 import com.helenartstore.HelenArtStore.dtos.response.AuthResponse;
 import com.helenartstore.HelenArtStore.utils.UserMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,10 +19,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@SuppressWarnings("null")
 class AuthServiceImplTest {
 
         @Mock
@@ -44,7 +42,6 @@ class AuthServiceImplTest {
         private AuthServiceImpl authService;
 
         private User user;
-        private User artist;
 
         @BeforeEach
         void setUp() {
@@ -56,11 +53,6 @@ class AuthServiceImplTest {
                                 .role(Role.USER)
                                 .build();
 
-                artist = User.builder()
-                                .id(1L)
-                                .username("artist")
-                                .role(Role.ARTIST)
-                                .build();
         }
 
         @Test
