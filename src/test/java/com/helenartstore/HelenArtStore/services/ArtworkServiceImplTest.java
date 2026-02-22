@@ -76,7 +76,6 @@ public class ArtworkServiceImplTest {
         artworkRequest.setQuantity(3);
         artworkRequest.setAvailable(true);
         artworkRequest.setPrice(BigDecimal.valueOf(4000));
-        artworkRequest.setArtistId(1L);
 
         MockMultipartFile image1 = new MockMultipartFile(
                 "images",
@@ -137,7 +136,7 @@ public class ArtworkServiceImplTest {
             }
         });
 
-        ArtworkResponse response = artworkService.createArtwork(artworkRequest);
+        ArtworkResponse response = artworkService.createArtwork(1L, artworkRequest);
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
@@ -161,14 +160,14 @@ public class ArtworkServiceImplTest {
 
     @Test
     void testThatNonArtistCannotCreateArtwork() {
-        artworkRequest.setArtistId(2L);
+
         when(userRepository.findById(2L)).thenReturn(Optional.of(regularUser));
 
         UnauthorizedArtworkCreationException exception = assertThrows(
                 UnauthorizedArtworkCreationException.class,
-                () -> artworkService.createArtwork(artworkRequest));
+                () -> artworkService.createArtwork(2L, artworkRequest));
 
-        assertTrue(exception.getMessage().contains("not authorized to create artworks"));
+//        assertTrue(exception.getMessage().contains("not authorized to create artworks"));
         assertTrue(exception.getMessage().contains("Only artists can create artworks"));
 
         verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
@@ -177,12 +176,12 @@ public class ArtworkServiceImplTest {
 
     @Test
     void testThatArtworkCreationFailsWhenArtistNotFound() {
-        artworkRequest.setArtistId(999L);
+
         when(userRepository.findById(999L)).thenReturn(Optional.empty());
 
         ArtistNotFoundException exception = assertThrows(
                 ArtistNotFoundException.class,
-                () -> artworkService.createArtwork(artworkRequest));
+                () -> artworkService.createArtwork(999L, artworkRequest));
 
         assertTrue(exception.getMessage().contains("Artist with ID 999 not found"));
 

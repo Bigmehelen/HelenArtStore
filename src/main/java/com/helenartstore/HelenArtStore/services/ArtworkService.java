@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 public interface ArtworkService {
-    ArtworkResponse createArtwork(ArtworkRequest request);
+    ArtworkResponse createArtwork(@org.springframework.lang.NonNull Long id, ArtworkRequest request);
 
     ArtworkResponse updateArtwork(@org.springframework.lang.NonNull Long id, UpdateArtwork update);
 

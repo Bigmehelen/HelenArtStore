@@ -92,11 +92,6 @@ public class AuthServiceImpl implements AuthService {
 
         user.setRole(Role.ARTIST);
         User savedUser = userRepository.save(user);
-
-        // RefreshUserDetails to ensure new role is picked up if needed, though simpler
-        // to just generate new token with updated user entity
-        // Actually customUserDetailsService.loadUserByUsername pulls from DB, so it
-        // should get updated role
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getUsername());
 
         String jwt = jwtService.generateToken(userDetails);

@@ -19,6 +19,7 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -61,7 +62,7 @@ public class ArtworkControllerTest {
         MockMultipartFile image = new MockMultipartFile("imagesUrls", "test.jpg", "image/jpeg",
                 "test image content".getBytes());
 
-        when(artworkService.createArtwork(any(ArtworkRequest.class))).thenReturn(artworkResponse);
+        when(artworkService.createArtwork(anyLong(), any(ArtworkRequest.class))).thenReturn(artworkResponse);
 
         mockMvc.perform(multipart("/api/v1/artworks")
                 .file(image)
@@ -69,7 +70,7 @@ public class ArtworkControllerTest {
                 .param("description", "Artwork set")
                 .param("quantity", "3")
                 .param("price", "4000")
-                .param("artistId", "1")
+                .param("id", "1")
                 .contentType(MediaType.MULTIPART_FORM_DATA))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Moremi"))
