@@ -19,7 +19,7 @@ public enum CartStatus {
         return description;
     }
 
-   public boolean canActivate() {
+    public boolean canActivate() {
         return this == CONFIRMED;
     }
 
@@ -29,7 +29,7 @@ public enum CartStatus {
 
     public boolean isFinal() {
         return this == COMPLETED || this == CANCELLED ||
-                    this == EXPIRED || this == REFUNDED;
+                this == EXPIRED || this == REFUNDED;
     }
 
 }

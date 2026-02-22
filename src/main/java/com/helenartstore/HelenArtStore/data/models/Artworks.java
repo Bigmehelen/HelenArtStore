@@ -26,8 +26,7 @@ public class Artworks {
     private List<String> imagesUrls;
     private BigDecimal price;
     private boolean isAvailable;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "artist_id", nullable = false)
-    private User Artist;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
 }

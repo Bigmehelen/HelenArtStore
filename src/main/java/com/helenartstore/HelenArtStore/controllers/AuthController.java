@@ -41,7 +41,7 @@ public class AuthController {
         // Authentication or Principal.
         // If the endpoint is secured, 'authentication' will be populated.
 
-        String username = authentication.getName();
+        String username = authentication != null ? authentication.getName() : null;
         AuthResponse response = authService.upgradeToArtist(username);
         return ResponseEntity.ok(response);
     }

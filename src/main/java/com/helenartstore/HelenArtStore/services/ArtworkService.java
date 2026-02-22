@@ -9,9 +9,13 @@ import java.util.List;
 
 @Service
 public interface ArtworkService {
-    ArtworkResponse createArtwork (ArtworkRequest request);
-    ArtworkResponse updateArtwork(Long id, UpdateArtwork update);
-    void deleteArtwork(Long id);
+    ArtworkResponse createArtwork(ArtworkRequest request);
+
+    ArtworkResponse updateArtwork(@org.springframework.lang.NonNull Long id, UpdateArtwork update);
+
+    void deleteArtwork(@org.springframework.lang.NonNull Long id);
+
     List<ArtworkResponse> getAllArtworks();
-    List<ArtworkResponse> getArtworksByName(String name);
+
+    List<ArtworkResponse> getArtworksByName(@org.springframework.lang.NonNull String name);
 }

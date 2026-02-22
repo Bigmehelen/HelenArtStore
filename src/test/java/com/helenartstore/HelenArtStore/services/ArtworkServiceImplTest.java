@@ -31,6 +31,7 @@ import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 @ActiveProfiles("test")
+@SuppressWarnings("null")
 public class ArtworkServiceImplTest {
 
     private ArtworkRequest artworkRequest;
@@ -99,7 +100,7 @@ public class ArtworkServiceImplTest {
         savedArtwork.setAvailable(true);
         savedArtwork.setPrice(BigDecimal.valueOf(4000));
         savedArtwork.setImagesUrls(List.of("url1", "url2"));
-        savedArtwork.setArtist(artistUser);
+        savedArtwork.setRole(Role.USER);
 
         ArtworkResponse response = new ArtworkResponse();
         response.setId(1L);
@@ -151,7 +152,6 @@ public class ArtworkServiceImplTest {
         assertEquals(1L, response.getArtistId());
         assertEquals("artist_user", response.getArtistName());
 
-
         verify(userRepository, times(1)).findById(1L);
         verify(cloudinaryService, times(2)).uploadImage(any(MultipartFile.class));
         verify(artworkMapper, times(1)).toEntity(any(ArtworkRequest.class));
@@ -163,7 +163,6 @@ public class ArtworkServiceImplTest {
     void testThatNonArtistCannotCreateArtwork() {
         artworkRequest.setArtistId(2L);
         when(userRepository.findById(2L)).thenReturn(Optional.of(regularUser));
-
 
         UnauthorizedArtworkCreationException exception = assertThrows(
                 UnauthorizedArtworkCreationException.class,
@@ -186,7 +185,6 @@ public class ArtworkServiceImplTest {
                 () -> artworkService.createArtwork(artworkRequest));
 
         assertTrue(exception.getMessage().contains("Artist with ID 999 not found"));
-
 
         verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
         verify(artworksRepository, never()).save(any(Artworks.class));
@@ -233,13 +231,13 @@ public class ArtworkServiceImplTest {
         verify(artworksRepository, times(1)).deleteById(1L);
     }
 
-        @Test
-        void testThatDeleteArtworkThrowsExceptionWhenNotFound() {
-                when(artworksRepository.existsById(99L)).thenReturn(false);
+    @Test
+    void testThatDeleteArtworkThrowsExceptionWhenNotFound() {
+        when(artworksRepository.existsById(99L)).thenReturn(false);
 
-                assertThrows(RuntimeException.class, () -> artworkService.deleteArtwork(99L));
-                verify(artworksRepository, never()).deleteById(anyLong());
-        }
+        assertThrows(RuntimeException.class, () -> artworkService.deleteArtwork(99L));
+        verify(artworksRepository, never()).deleteById(anyLong());
+    }
 
     @Test
     void testThatCanGetAllArtworks() {

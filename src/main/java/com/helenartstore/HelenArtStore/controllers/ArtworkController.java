@@ -25,15 +25,14 @@ public class ArtworkController {
     }
 
     @PatchMapping(value = "/{id}", consumes = { "multipart/form-data" })
-    public ResponseEntity<ArtworkResponse> updateArtwork(
-            @PathVariable Long id,
+    public ResponseEntity<ArtworkResponse> updateArtwork(@PathVariable @org.springframework.lang.NonNull Long id,
             @ModelAttribute UpdateArtwork update) {
         ArtworkResponse response = artworkService.updateArtwork(id, update);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteArtwork(@PathVariable Long id) {
+    public ResponseEntity<Void> deleteArtwork(@PathVariable @org.springframework.lang.NonNull Long id) {
         artworkService.deleteArtwork(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
@@ -45,7 +44,8 @@ public class ArtworkController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<List<ArtworkResponse>> getArtworksByName(@RequestParam String name) {
+    public ResponseEntity<List<ArtworkResponse>> getArtworksByName(
+            @RequestParam @org.springframework.lang.NonNull String name) {
         List<ArtworkResponse> responses = artworkService.getArtworksByName(name);
         return new ResponseEntity<>(responses, HttpStatus.OK);
     }
