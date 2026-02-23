@@ -41,7 +41,7 @@ class AuthControllerTest {
     void becomeArtist_Success() throws Exception {
         AuthResponse response = new AuthResponse();
         response.setUsername("testuser");
-        response.setRole(Role.ARTIST);
+        response.setRoles(java.util.Set.of(Role.ARTIST));
         response.setToken("new_token");
 
         when(authService.upgradeToArtist("testuser")).thenReturn(response);
@@ -49,7 +49,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/user/auth/become-artist")
                 .with(csrf())) // CSRF might be needed if security is active, but filters are disabled
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.role").value("ARTIST"))
+                .andExpect(jsonPath("$.roles[0]").value("ARTIST"))
                 .andExpect(jsonPath("$.token").value("new_token"));
     }
 }

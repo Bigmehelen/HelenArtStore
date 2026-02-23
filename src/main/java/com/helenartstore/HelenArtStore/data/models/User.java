@@ -7,7 +7,9 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "users", indexes = {
@@ -38,10 +40,13 @@ public class User implements UserDetails {
     private String profilePictureUrl;
     @Column(name = "phone_number", length = 20)
     private String phoneNumber;
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "role")
     @Builder.Default
-    private Role role = Role.USER;
+    private Set<Role> roles = new java.util.HashSet<>(java.util.List.of(Role.USER));
+
     @Column(nullable = false)
     @Builder.Default
     private Boolean enabled = true;
@@ -57,6 +62,8 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return roles.stream()
+                .map(r -> new SimpleGrantedAuthority(r.getAuthority()))
+                .toList();
     }
 }

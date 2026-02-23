@@ -6,6 +6,7 @@ import com.helenartstore.HelenArtStore.data.repository.UserRepository;
 import com.helenartstore.HelenArtStore.dtos.request.LoginRequest;
 import com.helenartstore.HelenArtStore.dtos.request.RegisterRequest;
 import com.helenartstore.HelenArtStore.dtos.response.AuthResponse;
+import com.helenartstore.HelenArtStore.exceptions.UserAlreadyArtistException;
 import com.helenartstore.HelenArtStore.exceptions.UserAlreadyExistException;
 import com.helenartstore.HelenArtStore.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -45,7 +48,7 @@ public class AuthServiceImpl implements AuthService {
             throw new UserAlreadyExistException("user with username already exist");
         }
         User user = userMapper.toEntity(request);
-        user.setRole(Role.USER);
+        // roles are initialized to USER by default in the entity
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         User savedUser = userRepository.save(user);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getUsername());
@@ -57,7 +60,7 @@ public class AuthServiceImpl implements AuthService {
                 savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getRole());
+                savedUser.getRoles());
     }
 
     @Override
@@ -68,16 +71,19 @@ public class AuthServiceImpl implements AuthService {
                         loginRequest.getUsername(),
                         loginRequest.getPassword()));
 
-        UserDetails userDetails = customUserDetailsService.loadUserByUsername(
-                loginRequest.getUsername());
+        User user = userRepository.findByUsername(loginRequest.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(user.getUsername());
         String token = jwtService.generateToken(userDetails);
 
-        AuthResponse response = new AuthResponse();
-        response.setToken(token);
-        response.setUsername(userDetails.getUsername());
-
-        return response;
+        return new AuthResponse(
+                token,
+                "Bearer",
+                user.getId(),
+                user.getUsername(),
+                user.getEmail(),
+                user.getRoles());
     }
 
     @Override
@@ -86,11 +92,11 @@ public class AuthServiceImpl implements AuthService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user.getRole() == Role.ARTIST) {
-            throw new RuntimeException("User is already an artist");
+        if (user.getRoles().contains(Role.ARTIST)) {
+            throw new UserAlreadyArtistException("User '" + username + "' is already an artist");
         }
 
-        user.setRole(Role.ARTIST);
+        user.getRoles().add(Role.ARTIST);
         User savedUser = userRepository.save(user);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getUsername());
 
@@ -102,7 +108,7 @@ public class AuthServiceImpl implements AuthService {
                 savedUser.getId(),
                 savedUser.getUsername(),
                 savedUser.getEmail(),
-                savedUser.getRole());
+                savedUser.getRoles());
     }
 
 }

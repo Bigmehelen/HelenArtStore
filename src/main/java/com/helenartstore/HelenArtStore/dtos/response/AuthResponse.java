@@ -13,14 +13,16 @@ public class AuthResponse {
     private Long id;
     private String username;
     private String email;
-    private Role role;
+    @Builder.Default
+    private java.util.Set<Role> roles = new java.util.HashSet<>();
 
-//    public AuthResponse(String token, String type, Long id, String username, String email, Role role) {
-//        this.type = type;
-//        this.token = token;
-//        this.id = id;
-//        this.username = username;
-//        this.email = email;
-//        this.role = role;
-//    }
+    // public AuthResponse(String token, String type, Long id, String username,
+    // String email, Role role) {
+    // this.type = type;
+    // this.token = token;
+    // this.id = id;
+    // this.username = username;
+    // this.email = email;
+    // this.role = role;
+    // }
 }

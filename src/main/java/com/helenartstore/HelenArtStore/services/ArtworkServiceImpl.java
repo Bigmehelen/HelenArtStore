@@ -31,7 +31,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     private ArtworkMapper artworkMapper;
 
     @Override
-    public ArtworkResponse createArtwork(@org.springframework.lang.NonNull Long id, ArtworkRequest request) {
+    public ArtworkResponse createArtwork(Long id, ArtworkRequest request) {
         findAndValidateArtist(id);
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile image : request.getImagesUrls()) {
@@ -83,7 +83,7 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .orElseThrow(
                         () -> new ArtistNotFoundException("Artist with ID " + id + " not found"));
 
-        if (artist.getRole() != Role.ARTIST) {
+        if (!artist.getRoles().contains(Role.ARTIST)) {
             throw new UnauthorizedArtworkCreationException("Only artists can create artworks");
         }
     }
