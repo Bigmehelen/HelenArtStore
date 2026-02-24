@@ -4,11 +4,9 @@ import com.helenartstore.HelenArtStore.data.models.Artworks;
 import com.helenartstore.HelenArtStore.data.models.Role;
 import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.data.repository.ArtworksRepository;
-import com.helenartstore.HelenArtStore.data.repository.UserRepository;
 import com.helenartstore.HelenArtStore.dtos.request.ArtworkRequest;
 import com.helenartstore.HelenArtStore.dtos.request.UpdateArtwork;
 import com.helenartstore.HelenArtStore.dtos.response.ArtworkResponse;
-import com.helenartstore.HelenArtStore.exceptions.ArtistNotFoundException;
 import com.helenartstore.HelenArtStore.exceptions.UnauthorizedArtworkCreationException;
 import com.helenartstore.HelenArtStore.utils.ArtworkMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,22 +22,23 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Autowired
     private ArtworksRepository artworksRepository;
     @Autowired
-    private UserRepository userRepository;
-    @Autowired
     private CloudinaryService cloudinaryService;
     @Autowired
     private ArtworkMapper artworkMapper;
 
     @Override
-    public ArtworkResponse createArtwork(Long id, ArtworkRequest request) {
-        findAndValidateArtist(id);
+    public ArtworkResponse createArtwork(User artist, ArtworkRequest request) {
+        if (!artist.getRoles().contains(Role.ARTIST)) {
+            throw new UnauthorizedArtworkCreationException("Only artists can create artworks");
+        }
         List<String> imageUrls = new ArrayList<>();
         for (MultipartFile image : request.getImagesUrls()) {
             String imageUrl = cloudinaryService.uploadImage(image);
             imageUrls.add(imageUrl);
         }
         Artworks artwork = artworkMapper.toEntity(request);
-        artwork.setArtistId(id);
+        artwork.setArtist(artist);
+        artwork.setImageUrls(imageUrls);
         artwork.setRole(Role.ARTIST);
         Artworks savedArtwork = artworksRepository.save(artwork);
         return artworkMapper.toResponse(savedArtwork);
@@ -77,17 +76,6 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .toList();
     }
 
-    private void findAndValidateArtist(Long id) {
-        @SuppressWarnings("null")
-        User artist = userRepository.findById(id)
-                .orElseThrow(
-                        () -> new ArtistNotFoundException("Artist with ID " + id + " not found"));
-
-        if (!artist.getRoles().contains(Role.ARTIST)) {
-            throw new UnauthorizedArtworkCreationException("Only artists can create artworks");
-        }
-    }
-
     private Artworks findArtworkById(@org.springframework.lang.NonNull Long id) {
         return artworksRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Artwork with id " + id + " not found"));
@@ -111,7 +99,7 @@ public class ArtworkServiceImpl implements ArtworkService {
             List<String> imageUrls = images.stream()
                     .map(cloudinaryService::uploadImage)
                     .toList();
-            artwork.setImagesUrls(imageUrls);
+            artwork.setImageUrls(imageUrls);
         }
     }
 }

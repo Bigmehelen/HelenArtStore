@@ -1,5 +1,6 @@
 package com.helenartstore.HelenArtStore.exceptions;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -9,6 +10,7 @@ import java.time.LocalDateTime;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(UserAlreadyArtistException.class)
@@ -64,5 +66,15 @@ public class GlobalExceptionHandler {
                 "status", 401,
                 "error", "Unauthorized",
                 "message", ex.getMessage()));
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, Object>> handleGeneralException(Exception ex) {
+        log.error("Unhandled exception occurred: ", ex);
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                "timestamp", LocalDateTime.now().toString(),
+                "status", 500,
+                "error", "Internal Server Error",
+                "message", ex.getMessage() != null ? ex.getMessage() : "An unexpected error occurred."));
     }
 }

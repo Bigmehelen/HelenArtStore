@@ -15,7 +15,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -50,7 +52,7 @@ class AuthServiceImplTest {
                                 .username("testuser")
                                 .email("test@example.com")
                                 .password("password")
-                                .role(Role.USER)
+                                .roles(new HashSet<>(Set.of(Role.USER)))
                                 .build();
 
         }
@@ -65,17 +67,18 @@ class AuthServiceImplTest {
                 AuthResponse response = authService.upgradeToArtist("testuser");
 
                 assertNotNull(response);
-                assertEquals(Role.ARTIST, response.getRole());
+                assertTrue(response.getRoles().contains(Role.ARTIST));
                 assertEquals("new_token", response.getToken());
                 verify(userRepository).save(user);
         }
 
         @Test
         void upgradeToArtist_AlreadyArtist() {
-                user.setRole(Role.ARTIST);
+                user.getRoles().add(Role.ARTIST);
                 when(userRepository.findByUsername("testuser")).thenReturn(Optional.of(user));
 
-                assertThrows(RuntimeException.class, () -> authService.upgradeToArtist("testuser"));
+                assertThrows(com.helenartstore.HelenArtStore.exceptions.UserAlreadyArtistException.class,
+                                () -> authService.upgradeToArtist("testuser"));
                 verify(userRepository, never()).save(any(User.class));
         }
 
@@ -83,6 +86,7 @@ class AuthServiceImplTest {
         void upgradeToArtist_UserNotFound() {
                 when(userRepository.findByUsername("unknown")).thenReturn(Optional.empty());
 
-                assertThrows(RuntimeException.class, () -> authService.upgradeToArtist("unknown"));
+                assertThrows(com.helenartstore.HelenArtStore.exceptions.UserNotFoundException.class,
+                                () -> authService.upgradeToArtist("unknown"));
         }
 }

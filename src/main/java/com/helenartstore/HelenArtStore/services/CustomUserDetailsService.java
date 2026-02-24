@@ -1,14 +1,11 @@
 package com.helenartstore.HelenArtStore.services;
 
-import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.data.repository.UserRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import java.util.Collection;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -18,17 +15,10 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         @Override
         public UserDetails loadUserByUsername(String username)
-                        throws UsernameNotFoundException {
-                User user = userRepository.findByUsername(username)
-                                .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
-                return org.springframework.security.core.userdetails.User
-                                .withUsername(user.getUsername())
-                                .password(user.getPassword())
-                                .authorities(user.getAuthorities())
-                                .accountExpired(!user.getAccountNonExpired())
-                                .accountLocked(!user.getAccountNonLocked())
-                                .credentialsExpired(!user.getCredentialsNonExpired())
-                                .disabled(!user.getEnabled())
-                                .build();
-        }
+                throws UsernameNotFoundException {
+
+        return userRepository.findByUsername(username)
+                .orElseThrow(() ->
+                        new UsernameNotFoundException("User not found: " + username));
+    }
 }

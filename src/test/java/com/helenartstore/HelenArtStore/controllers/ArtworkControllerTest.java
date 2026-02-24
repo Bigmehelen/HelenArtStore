@@ -4,6 +4,8 @@ import com.helenartstore.HelenArtStore.dtos.request.ArtworkRequest;
 import com.helenartstore.HelenArtStore.dtos.request.UpdateArtwork;
 import com.helenartstore.HelenArtStore.dtos.response.ArtworkResponse;
 import com.helenartstore.HelenArtStore.services.ArtworkService;
+import com.helenartstore.HelenArtStore.data.models.User;
+// import com.helenartstore.HelenArtStore.services.CustomUserDetails;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,7 +21,6 @@ import java.math.BigDecimal;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
@@ -62,7 +63,7 @@ public class ArtworkControllerTest {
         MockMultipartFile image = new MockMultipartFile("imagesUrls", "test.jpg", "image/jpeg",
                 "test image content".getBytes());
 
-        when(artworkService.createArtwork(anyLong(), any(ArtworkRequest.class))).thenReturn(artworkResponse);
+        when(artworkService.createArtwork(any(User.class), any(ArtworkRequest.class))).thenReturn(artworkResponse);
 
         mockMvc.perform(multipart("/api/v1/artworks")
                 .file(image)

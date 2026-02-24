@@ -19,9 +19,9 @@ public class ArtworkController {
     private ArtworkService artworkService;
 
     @PostMapping(consumes = { "multipart/form-data" })
-    public ResponseEntity<ArtworkResponse> createArtwork(@RequestParam @org.springframework.lang.NonNull Long id,
+    public ResponseEntity<ArtworkResponse> createArtwork(@RequestParam com.helenartstore.HelenArtStore.data.models.User artist,
             @ModelAttribute ArtworkRequest request) {
-        ArtworkResponse response = artworkService.createArtwork(id, request);
+        ArtworkResponse response = artworkService.createArtwork(artist, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 

@@ -8,6 +8,7 @@ import com.helenartstore.HelenArtStore.dtos.request.RegisterRequest;
 import com.helenartstore.HelenArtStore.dtos.response.AuthResponse;
 import com.helenartstore.HelenArtStore.exceptions.UserAlreadyArtistException;
 import com.helenartstore.HelenArtStore.exceptions.UserAlreadyExistException;
+import com.helenartstore.HelenArtStore.exceptions.UserNotFoundException;
 import com.helenartstore.HelenArtStore.utils.UserMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,8 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Set;
 
 @Service
 public class AuthServiceImpl implements AuthService {
@@ -48,8 +47,8 @@ public class AuthServiceImpl implements AuthService {
             throw new UserAlreadyExistException("user with username already exist");
         }
         User user = userMapper.toEntity(request);
-        // roles are initialized to USER by default in the entity
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRoles(new java.util.HashSet<>(java.util.Set.of(Role.USER)));
         User savedUser = userRepository.save(user);
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(savedUser.getUsername());
         String jwt = jwtService.generateToken(userDetails);
@@ -89,8 +88,11 @@ public class AuthServiceImpl implements AuthService {
     @Override
     @Transactional
     public AuthResponse upgradeToArtist(String username) {
+        if (username == null || username.isBlank()) {
+            throw new UserNotFoundException("Username cannot be null or empty");
+        }
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException("User '" + username + "' not found"));
 
         if (user.getRoles().contains(Role.ARTIST)) {
             throw new UserAlreadyArtistException("User '" + username + "' is already an artist");

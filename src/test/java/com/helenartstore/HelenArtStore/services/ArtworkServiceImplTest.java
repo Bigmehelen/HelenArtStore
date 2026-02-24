@@ -8,7 +8,6 @@ import com.helenartstore.HelenArtStore.data.repository.UserRepository;
 import com.helenartstore.HelenArtStore.dtos.request.ArtworkRequest;
 import com.helenartstore.HelenArtStore.dtos.request.UpdateArtwork;
 import com.helenartstore.HelenArtStore.dtos.response.ArtworkResponse;
-import com.helenartstore.HelenArtStore.exceptions.ArtistNotFoundException;
 import com.helenartstore.HelenArtStore.exceptions.UnauthorizedArtworkCreationException;
 import com.helenartstore.HelenArtStore.utils.ArtworkMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -60,14 +60,14 @@ public class ArtworkServiceImplTest {
                 .id(1L)
                 .username("artist_user")
                 .email("artist@example.com")
-                .role(Role.ARTIST)
+                .roles(Set.of(Role.ARTIST))
                 .build();
 
         regularUser = User.builder()
                 .id(2L)
                 .username("regular_user")
                 .email("user@example.com")
-                .role(Role.USER)
+                .roles(Set.of(Role.USER))
                 .build();
 
         artworkRequest = new ArtworkRequest();
@@ -98,7 +98,7 @@ public class ArtworkServiceImplTest {
         savedArtwork.setQuantity(3);
         savedArtwork.setAvailable(true);
         savedArtwork.setPrice(BigDecimal.valueOf(4000));
-        savedArtwork.setImagesUrls(List.of("url1", "url2"));
+        savedArtwork.setImageUrls(List.of("url1", "url2"));
         savedArtwork.setRole(Role.USER);
 
         ArtworkResponse response = new ArtworkResponse();
@@ -116,11 +116,6 @@ public class ArtworkServiceImplTest {
     @Test
     void testThatCanCreateArtwork() {
 
-        when(userRepository.findById(1L)).thenReturn(Optional.of(artistUser));
-        when(cloudinaryService.uploadImage(any(MultipartFile.class)))
-                .thenReturn("url1")
-                .thenReturn("url2");
-        when(artworkMapper.toEntity(any(ArtworkRequest.class))).thenReturn(savedArtwork);
         when(artworksRepository.save(any(Artworks.class))).thenReturn(savedArtwork);
         when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
             {
@@ -136,7 +131,7 @@ public class ArtworkServiceImplTest {
             }
         });
 
-        ArtworkResponse response = artworkService.createArtwork(1L, artworkRequest);
+        ArtworkResponse response = artworkService.createArtwork(artistUser, artworkRequest);
 
         assertNotNull(response);
         assertEquals(1L, response.getId());
@@ -151,7 +146,6 @@ public class ArtworkServiceImplTest {
         assertEquals(1L, response.getArtistId());
         assertEquals("artist_user", response.getArtistName());
 
-        verify(userRepository, times(1)).findById(1L);
         verify(cloudinaryService, times(2)).uploadImage(any(MultipartFile.class));
         verify(artworkMapper, times(1)).toEntity(any(ArtworkRequest.class));
         verify(artworksRepository, times(1)).save(any(Artworks.class));
@@ -161,29 +155,11 @@ public class ArtworkServiceImplTest {
     @Test
     void testThatNonArtistCannotCreateArtwork() {
 
-        when(userRepository.findById(2L)).thenReturn(Optional.of(regularUser));
-
         UnauthorizedArtworkCreationException exception = assertThrows(
                 UnauthorizedArtworkCreationException.class,
-                () -> artworkService.createArtwork(2L, artworkRequest));
+                () -> artworkService.createArtwork(regularUser, artworkRequest));
 
-//        assertTrue(exception.getMessage().contains("not authorized to create artworks"));
         assertTrue(exception.getMessage().contains("Only artists can create artworks"));
-
-        verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
-        verify(artworksRepository, never()).save(any(Artworks.class));
-    }
-
-    @Test
-    void testThatArtworkCreationFailsWhenArtistNotFound() {
-
-        when(userRepository.findById(999L)).thenReturn(Optional.empty());
-
-        ArtistNotFoundException exception = assertThrows(
-                ArtistNotFoundException.class,
-                () -> artworkService.createArtwork(999L, artworkRequest));
-
-        assertTrue(exception.getMessage().contains("Artist with ID 999 not found"));
 
         verify(cloudinaryService, never()).uploadImage(any(MultipartFile.class));
         verify(artworksRepository, never()).save(any(Artworks.class));
