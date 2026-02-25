@@ -14,7 +14,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import static org.springframework.http.HttpMethod.POST;
+import static org.springframework.http.HttpMethod.*;
 
 @Configuration
 @EnableWebSecurity
@@ -35,6 +35,10 @@ public class SecurityConfig {
                                                 .requestMatchers(POST, "/api/user/auth/register",
                                                 "/api/user/auth/login").permitAll()
                                                 .requestMatchers("/error").permitAll()
+                                                .requestMatchers(POST, "/api/v1/artworks/**").hasRole("ARTIST")
+                                                .requestMatchers(PATCH, "/api/v1/artworks/**").hasRole("ARTIST")
+                                                .requestMatchers(DELETE, "/api/v1/artworks/**").hasRole("ARTIST")
+                                                .requestMatchers(GET, "/api/v1/artworks/**").permitAll()
                                                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                                                 .anyRequest().authenticated())
                                 .sessionManagement(session -> session

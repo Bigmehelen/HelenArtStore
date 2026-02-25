@@ -14,7 +14,7 @@ public class ArtworkResponse {
     private int quantity;
     private List<String> imageUrls;
     private BigDecimal price;
-    private boolean isAvailable;
+    private boolean available;
     private Long artistId;
     private String artistName;
 

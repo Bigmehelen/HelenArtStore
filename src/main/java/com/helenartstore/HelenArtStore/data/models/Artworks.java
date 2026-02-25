@@ -20,23 +20,19 @@ public class Artworks {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @org.springframework.lang.Nullable
     private Long id;
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User artist;
-
     private String name;
     private String description;
     private int quantity;
-
     @ElementCollection
     @CollectionTable(name = "artwork_images", joinColumns = @JoinColumn(name = "artwork_id"))
     @Column(name = "image_url")
     private List<String> imageUrls;
-
     private BigDecimal price;
-    private boolean isAvailable;
+    @Column(name = "is_available", nullable = false)
+    private boolean available;
 
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "artist_id")
+    private User artist;
 
 }

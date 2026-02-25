@@ -1,5 +1,6 @@
 package com.helenartstore.HelenArtStore.controllers;
 
+import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.dtos.request.ArtworkRequest;
 import com.helenartstore.HelenArtStore.dtos.request.UpdateArtwork;
 import com.helenartstore.HelenArtStore.dtos.response.ArtworkResponse;
@@ -7,6 +8,8 @@ import com.helenartstore.HelenArtStore.services.ArtworkService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -19,7 +22,9 @@ public class ArtworkController {
     private ArtworkService artworkService;
 
     @PostMapping(consumes = { "multipart/form-data" })
-    public ResponseEntity<ArtworkResponse> createArtwork(@RequestParam com.helenartstore.HelenArtStore.data.models.User artist,
+    @PreAuthorize("hasRole('ARTIST')")
+    public ResponseEntity<ArtworkResponse> createArtwork(
+            @AuthenticationPrincipal User artist,
             @ModelAttribute ArtworkRequest request) {
         ArtworkResponse response = artworkService.createArtwork(artist, request);
         return new ResponseEntity<>(response, HttpStatus.CREATED);

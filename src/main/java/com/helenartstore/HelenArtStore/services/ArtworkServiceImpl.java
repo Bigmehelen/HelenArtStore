@@ -39,7 +39,6 @@ public class ArtworkServiceImpl implements ArtworkService {
         Artworks artwork = artworkMapper.toEntity(request);
         artwork.setArtist(artist);
         artwork.setImageUrls(imageUrls);
-        artwork.setRole(Role.ARTIST);
         Artworks savedArtwork = artworksRepository.save(artwork);
         return artworkMapper.toResponse(savedArtwork);
     }
