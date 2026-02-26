@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ArtworksRepository extends JpaRepository<Artworks, Long> {
+    @Query("SELECT a FROM Artworks a LEFT JOIN FETCH a.imageUrls")
     List<Artworks> findByArtistId(Long artistId);
 
     @Query(value = """

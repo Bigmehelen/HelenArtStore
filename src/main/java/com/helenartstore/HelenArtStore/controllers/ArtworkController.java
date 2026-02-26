@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -31,6 +32,7 @@ public class ArtworkController {
     }
 
     @PatchMapping(value = "/{id}", consumes = { "multipart/form-data" })
+    @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<ArtworkResponse> updateArtwork(@PathVariable @org.springframework.lang.NonNull Long id,
             @ModelAttribute UpdateArtwork update) {
         ArtworkResponse response = artworkService.updateArtwork(id, update);
@@ -38,12 +40,14 @@ public class ArtworkController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ARTIST')")
     public ResponseEntity<Void> deleteArtwork(@PathVariable @org.springframework.lang.NonNull Long id) {
         artworkService.deleteArtwork(id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @GetMapping("/all")
+    @Transactional(readOnly = true)
     public ResponseEntity<List<ArtworkResponse>> getAllArtworks() {
         List<ArtworkResponse> responses = artworkService.getAllArtworks();
         return new ResponseEntity<>(responses, HttpStatus.OK);
