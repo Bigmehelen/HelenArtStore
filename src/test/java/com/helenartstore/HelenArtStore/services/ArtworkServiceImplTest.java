@@ -99,6 +99,7 @@ public class ArtworkServiceImplTest {
         savedArtwork.setAvailable(true);
         savedArtwork.setPrice(BigDecimal.valueOf(4000));
         savedArtwork.setImageUrls(List.of("url1", "url2"));
+        savedArtwork.setArtist(artistUser);
 
         ArtworkResponse response = new ArtworkResponse();
         response.setId(1L);
@@ -114,7 +115,7 @@ public class ArtworkServiceImplTest {
 
     @Test
     void testThatCanCreateArtwork() {
-
+        when(artworkMapper.toEntity(any(ArtworkRequest.class))).thenReturn(new Artworks());
         when(artworksRepository.save(any(Artworks.class))).thenReturn(savedArtwork);
         when(artworkMapper.toResponse(any(Artworks.class))).thenReturn(new ArtworkResponse() {
             {
@@ -180,7 +181,7 @@ public class ArtworkServiceImplTest {
             }
         });
 
-        ArtworkResponse response = artworkService.updateArtwork(1L, update);
+        ArtworkResponse response = artworkService.updateArtwork(artistUser, 1L, update);
         assertNotNull(response);
         assertEquals("Moremi Remixed", response.getName());
         assertEquals(BigDecimal.valueOf(5000), response.getPrice());
@@ -193,23 +194,49 @@ public class ArtworkServiceImplTest {
         UpdateArtwork update = new UpdateArtwork();
         when(artworksRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> artworkService.updateArtwork(99L, update));
+        assertThrows(RuntimeException.class, () -> artworkService.updateArtwork(artistUser, 99L, update));
+    }
+
+    @Test
+    void testThatUpdateArtworkThrowsExceptionWhenArtistIsNotOwner() {
+        UpdateArtwork update = new UpdateArtwork();
+
+        when(artworksRepository.findById(1L)).thenReturn(Optional.of(savedArtwork));
+
+        UnauthorizedArtworkCreationException exception = assertThrows(
+                UnauthorizedArtworkCreationException.class,
+                () -> artworkService.updateArtwork(regularUser, 1L, update));
+
+        assertTrue(exception.getMessage().contains("You can only update your own artworks"));
+        verify(artworksRepository, never()).save(any(Artworks.class));
     }
 
     @Test
     void testThatCanDeleteArtwork() {
-        when(artworksRepository.existsById(1L)).thenReturn(true);
+        when(artworksRepository.findById(1L)).thenReturn(Optional.of(savedArtwork));
         doNothing().when(artworksRepository).deleteById(1L);
 
-        artworkService.deleteArtwork(1L);
+        artworkService.deleteArtwork(artistUser, 1L);
         verify(artworksRepository, times(1)).deleteById(1L);
     }
 
     @Test
     void testThatDeleteArtworkThrowsExceptionWhenNotFound() {
-        when(artworksRepository.existsById(99L)).thenReturn(false);
+        when(artworksRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(RuntimeException.class, () -> artworkService.deleteArtwork(99L));
+        assertThrows(RuntimeException.class, () -> artworkService.deleteArtwork(artistUser, 99L));
+        verify(artworksRepository, never()).deleteById(anyLong());
+    }
+
+    @Test
+    void testThatDeleteArtworkThrowsExceptionWhenArtistIsNotOwner() {
+        when(artworksRepository.findById(1L)).thenReturn(Optional.of(savedArtwork));
+
+        UnauthorizedArtworkCreationException exception = assertThrows(
+                UnauthorizedArtworkCreationException.class,
+                () -> artworkService.deleteArtwork(regularUser, 1L));
+
+        assertTrue(exception.getMessage().contains("You can only delete your own artworks"));
         verify(artworksRepository, never()).deleteById(anyLong());
     }
 

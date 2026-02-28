@@ -87,7 +87,8 @@ public class ArtworkControllerTest {
         updatedResponse.setId(1L);
         updatedResponse.setName("Moremi Updated");
 
-        when(artworkService.updateArtwork(eq(1L), any(UpdateArtwork.class))).thenReturn(updatedResponse);
+        when(artworkService.updateArtwork(any(User.class), eq(1L), any(UpdateArtwork.class)))
+                .thenReturn(updatedResponse);
 
         mockMvc.perform(multipart("/api/v1/artworks/{id}", 1L)
                 .file(image)
@@ -102,7 +103,7 @@ public class ArtworkControllerTest {
 
     @Test
     void deleteArtwork() throws Exception {
-        doNothing().when(artworkService).deleteArtwork(1L);
+        doNothing().when(artworkService).deleteArtwork(any(User.class), eq(1L));
 
         mockMvc.perform(delete("/api/v1/artworks/{id}", 1L))
                 .andExpect(status().isNoContent());

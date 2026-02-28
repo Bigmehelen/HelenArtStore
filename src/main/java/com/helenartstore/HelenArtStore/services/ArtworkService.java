@@ -11,9 +11,11 @@ import java.util.List;
 public interface ArtworkService {
     ArtworkResponse createArtwork(com.helenartstore.HelenArtStore.data.models.User artist, ArtworkRequest request);
 
-    ArtworkResponse updateArtwork(@org.springframework.lang.NonNull Long id, UpdateArtwork update);
+    ArtworkResponse updateArtwork(com.helenartstore.HelenArtStore.data.models.User artist,
+            @org.springframework.lang.NonNull Long id, UpdateArtwork update);
 
-    void deleteArtwork(@org.springframework.lang.NonNull Long id);
+    void deleteArtwork(com.helenartstore.HelenArtStore.data.models.User artist,
+            @org.springframework.lang.NonNull Long id);
 
     List<ArtworkResponse> getAllArtworks();
 

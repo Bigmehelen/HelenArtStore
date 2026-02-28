@@ -33,16 +33,18 @@ public class ArtworkController {
 
     @PatchMapping(value = "/{id}", consumes = { "multipart/form-data" })
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<ArtworkResponse> updateArtwork(@PathVariable @org.springframework.lang.NonNull Long id,
+    public ResponseEntity<ArtworkResponse> updateArtwork(@AuthenticationPrincipal User artist,
+            @PathVariable @org.springframework.lang.NonNull Long id,
             @ModelAttribute UpdateArtwork update) {
-        ArtworkResponse response = artworkService.updateArtwork(id, update);
+        ArtworkResponse response = artworkService.updateArtwork(artist, id, update);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ARTIST')")
-    public ResponseEntity<Void> deleteArtwork(@PathVariable @org.springframework.lang.NonNull Long id) {
-        artworkService.deleteArtwork(id);
+    public ResponseEntity<Void> deleteArtwork(@AuthenticationPrincipal User artist,
+            @PathVariable @org.springframework.lang.NonNull Long id) {
+        artworkService.deleteArtwork(artist, id);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

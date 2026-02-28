@@ -21,12 +21,16 @@ public class UserRepositoryTest {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private com.helenartstore.HelenArtStore.data.repository.ArtworksRepository artworksRepository;
+
     @BeforeEach
     public void setup() {
         user = new User();
         user.setUsername("helen");
         user.setEmail("helen@gamil.com");
         user.setPassword("password123");
+        artworksRepository.deleteAll();
         userRepository.deleteAll();
     }
 

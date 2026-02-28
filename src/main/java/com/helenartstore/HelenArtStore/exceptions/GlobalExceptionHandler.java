@@ -10,6 +10,7 @@ import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -72,6 +73,15 @@ public class GlobalExceptionHandler {
                                 "message", ex.getMessage()));
         }
 
+        @ExceptionHandler(ArtworkNotFoundException.class)
+        public ResponseEntity<Map<String, Object>> handleArtworkNotFound(ArtworkNotFoundException ex) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
+                                "timestamp", LocalDateTime.now().toString(),
+                                "status", 404,
+                                "error", "Not Found",
+                                "message", ex.getMessage()));
+        }
+
         @ExceptionHandler(UserNotFoundException.class)
         public ResponseEntity<Map<String, Object>> handleUserNotFound(UserNotFoundException ex) {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body(Map.of(
@@ -107,6 +117,19 @@ public class GlobalExceptionHandler {
                                 "status", 401,
                                 "error", "Unauthorized",
                                 "message", ex.getMessage()));
+        }
+
+        @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+        public ResponseEntity<Map<String, Object>> handleTypeMismatch(MethodArgumentTypeMismatchException ex) {
+                Class<?> requiredType = ex.getRequiredType();
+                String typeName = requiredType != null ? requiredType.getSimpleName() : "unknown";
+                String message = String.format("The parameter '%s' should be of type '%s'. Value '%s' is invalid.",
+                                ex.getName(), typeName, ex.getValue());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of(
+                                "timestamp", LocalDateTime.now().toString(),
+                                "status", 400,
+                                "error", "Type Mismatch",
+                                "message", message));
         }
 
         @ExceptionHandler(Exception.class)

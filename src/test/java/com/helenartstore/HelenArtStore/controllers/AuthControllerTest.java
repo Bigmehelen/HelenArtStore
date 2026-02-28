@@ -52,10 +52,11 @@ class AuthControllerTest {
         response.setRoles(new java.util.HashSet<>(java.util.Set.of(Role.ARTIST)));
         response.setToken("new_token");
 
-        when(authService.upgradeToArtist("testuser")).thenReturn(response);
+        when(authService.upgradeToArtist(any())).thenReturn(response);
 
         mockMvc.perform(post("/api/user/auth/become-artist")
                 .with(csrf()))
+                .andDo(org.springframework.test.web.servlet.result.MockMvcResultHandlers.print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.username").value("testuser"))
                 .andExpect(jsonPath("$.token").value("new_token"));
