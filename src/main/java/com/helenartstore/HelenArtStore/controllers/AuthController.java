@@ -38,4 +38,9 @@ public class AuthController {
         AuthResponse response = authService.upgradeToArtist(username);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout() {
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }

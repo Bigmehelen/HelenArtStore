@@ -33,7 +33,7 @@ public class SecurityConfig {
                                 .csrf(AbstractHttpConfigurer::disable)
                                 .authorizeHttpRequests(auth -> auth
                                                 .requestMatchers(POST, "/api/user/auth/register",
-                                                                "/api/user/auth/login")
+                                                                "/api/user/auth/login", "/api/user/auth/logout")
                                                 .permitAll()
                                                 .requestMatchers("/error").permitAll()
                                                 .requestMatchers(POST, "/api/v1/artworks/**").hasRole("ARTIST")
