@@ -18,6 +18,7 @@ public interface ArtworkService {
             @org.springframework.lang.NonNull Long id);
 
     List<ArtworkResponse> getAllArtworks();
+    ArtworkResponse getArtworkById(Long id);
 
     List<ArtworkResponse> getArtworksByName(@org.springframework.lang.NonNull String name);
 }

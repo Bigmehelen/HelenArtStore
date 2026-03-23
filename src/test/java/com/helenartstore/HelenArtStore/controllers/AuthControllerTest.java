@@ -36,7 +36,7 @@ class AuthControllerTest {
     private AuthService authService;
 
     @MockitoBean
-    private JwtService jwtService; // Required because SecurityConfig might scan it or filters use it
+    private JwtService jwtService;
 
     @MockitoBean
     private UserDetailsService userDetailsService;

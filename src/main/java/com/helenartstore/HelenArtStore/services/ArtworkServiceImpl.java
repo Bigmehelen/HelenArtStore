@@ -85,6 +85,13 @@ public class ArtworkServiceImpl implements ArtworkService {
                 .toList();
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public ArtworkResponse getArtworkById(@org.springframework.lang.NonNull Long id) {
+        Artworks artwork = findArtworkById(id); 
+        return artworkMapper.toResponse(artwork);
+    }
+
     private Artworks findArtworkById(@org.springframework.lang.NonNull Long id) {
         return artworksRepository.findById(id)
                 .orElseThrow(() -> new ArtworkNotFoundException("Artwork with id " + id + " not found"));
