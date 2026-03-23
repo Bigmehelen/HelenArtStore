@@ -31,7 +31,7 @@ public class Artworks {
     @Column(name = "is_available", nullable = false)
     private boolean available;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "artist_id")
     private User artist;
 

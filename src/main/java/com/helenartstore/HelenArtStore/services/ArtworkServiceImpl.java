@@ -11,6 +11,7 @@ import com.helenartstore.HelenArtStore.exceptions.ArtworkNotFoundException;
 import com.helenartstore.HelenArtStore.exceptions.UnauthorizedArtworkCreationException;
 import com.helenartstore.HelenArtStore.utils.ArtworkMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -70,6 +71,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ArtworkResponse> getAllArtworks() {
         return artworksRepository.findAll().stream()
                 .map(artworkMapper::toResponse)

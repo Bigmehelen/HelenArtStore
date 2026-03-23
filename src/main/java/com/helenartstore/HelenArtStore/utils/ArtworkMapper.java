@@ -18,6 +18,18 @@ public class ArtworkMapper {
     }
 
     public ArtworkResponse toResponse(Artworks artwork) {
-        return modelMapper.map(artwork, ArtworkResponse.class);
+        ArtworkResponse response = new ArtworkResponse();
+        response.setId(artwork.getId());
+        response.setName(artwork.getName());
+        response.setDescription(artwork.getDescription());
+        response.setQuantity(artwork.getQuantity());
+        response.setImageUrls(artwork.getImageUrls());
+        response.setPrice(artwork.getPrice());
+        response.setAvailable(artwork.isAvailable());
+        if (artwork.getArtist() != null) {
+            response.setArtistId(artwork.getArtist().getId());
+            response.setArtistName(artwork.getArtist().getUsername());
+        }
+        return response;
     }
 }
