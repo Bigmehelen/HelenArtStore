@@ -23,7 +23,7 @@ public class Artworks {
     private String name;
     private String description;
     private int quantity;
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "artwork_images", joinColumns = @JoinColumn(name = "artwork_id"))
     @Column(name = "image_url")
     private List<String> imageUrls;
