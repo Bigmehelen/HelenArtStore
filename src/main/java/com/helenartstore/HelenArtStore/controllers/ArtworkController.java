@@ -53,7 +53,8 @@ public class ArtworkController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<ArtworkResponse>> getAllArtworks() {
         List<ArtworkResponse> responses = artworkService.getAllArtworks();
-        return new ResponseEntity<>(responses, HttpStatus.OK);
+        // return new ResponseEntity<>(responses, HttpStatus.OK);
+        return ResponseEntity.ok(responses);
     }
 
     @GetMapping("/search")
