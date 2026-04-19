@@ -27,6 +27,7 @@ public class JwtService {
     public void debugJwtSecret() {
         System.out.println("JWT SECRET LENGTH = " + jwtConfig.getSecret().length());
     }
+
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
@@ -42,9 +43,9 @@ public class JwtService {
 
     private Claims extractAllClaims(String token) {
         return Jwts.parser()
-                .verifyWith(getSignKey())        // ✅ Use this
+                .verifyWith(getSignKey())
                 .build()
-                .parseSignedClaims(token)        // ✅ Use this
+                .parseSignedClaims(token)
                 .getPayload();
     }
 
@@ -68,11 +69,11 @@ public class JwtService {
 
     private String createToken(Map<String, Object> claims, String subject) {
         return Jwts.builder()
-                .claims(claims)              // ✅ NEW API
-                .subject(subject)            // ✅ NEW API
-                .issuedAt(new Date(System.currentTimeMillis()))     // ✅ NEW API
-                .expiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))  // ✅ NEW API
-                .signWith(getSignKey())      // ✅ NEW API (no algorithm needed)
+                .claims(claims)
+                .subject(subject)
+                .issuedAt(new Date(System.currentTimeMillis()))
+                .expiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
+                .signWith(getSignKey())
                 .compact();
     }
 
