@@ -6,6 +6,7 @@ import com.helenartstore.HelenArtStore.dtos.request.ArtworkRequest;
 import com.helenartstore.HelenArtStore.dtos.request.UpdateArtwork;
 import com.helenartstore.HelenArtStore.dtos.response.ArtworkResponse;
 import com.helenartstore.HelenArtStore.services.ArtworkService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,11 +18,13 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@Slf4j
 @RequestMapping("/api/v1/artworks")
 public class ArtworkController {
 
     @Autowired
     private ArtworkService artworkService;
+
 
     @PostMapping(consumes = { "multipart/form-data" })
     @PreAuthorize("hasRole('ARTIST')")
@@ -53,6 +56,7 @@ public class ArtworkController {
     @Transactional(readOnly = true)
     public ResponseEntity<List<ArtworkResponse>> getAllArtworks() {
         List<ArtworkResponse> responses = artworkService.getAllArtworks();
+        log.info("Artworks list: {}", responses);
         // return new ResponseEntity<>(responses, HttpStatus.OK);
         return ResponseEntity.ok(responses);
     }

@@ -7,6 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -27,7 +28,7 @@ public class Artworks {
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "artwork_images", joinColumns = @JoinColumn(name = "artwork_id"))
     @Column(name = "image_url")
-    private List<String> imageUrls;
+    private List<String> imagesUrls = new ArrayList<>();
 
     private BigDecimal price;
     @Column(name = "is_available", nullable = false)

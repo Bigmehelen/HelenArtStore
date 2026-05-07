@@ -1,6 +1,7 @@
 package com.helenartstore.HelenArtStore.services;
 
 import com.helenartstore.HelenArtStore.data.models.Artworks;
+import java.util.stream.Collectors;
 import com.helenartstore.HelenArtStore.data.models.Role;
 import com.helenartstore.HelenArtStore.data.models.User;
 import com.helenartstore.HelenArtStore.data.repository.ArtworksRepository;
@@ -44,7 +45,7 @@ public class ArtworkServiceImpl implements ArtworkService {
         }
         Artworks artwork = artworkMapper.toEntity(request);
         artwork.setArtist(artist);
-        artwork.setImageUrls(imageUrls);
+        artwork.setImagesUrls(imageUrls);
         Artworks savedArtwork = artworksRepository.save(artwork);
         return artworkMapper.toResponse(savedArtwork);
     }
@@ -110,14 +111,14 @@ public class ArtworkServiceImpl implements ArtworkService {
             artwork.setAvailable(update.getAvailable());
     }
 
-    private void updateArtworkImages(Artworks artwork, List<MultipartFile> images) {
+    public void updateArtworkImages(Artworks artwork, List<MultipartFile> images) {
         if (images != null && !images.isEmpty()) {
             List<String> imageUrls = images.stream()
                     .filter(file -> !file.isEmpty())
                     .map(cloudinaryService::uploadImage)
-                    .toList();
+                    .collect(Collectors.toList());
             if (!imageUrls.isEmpty()) {
-                artwork.setImageUrls(imageUrls);
+                artwork.setImagesUrls(imageUrls);
             }
         }
     }

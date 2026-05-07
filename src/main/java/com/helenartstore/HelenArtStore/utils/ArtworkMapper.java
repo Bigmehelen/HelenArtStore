@@ -23,9 +23,9 @@ public class ArtworkMapper {
         response.setName(artwork.getName());
         response.setDescription(artwork.getDescription());
         response.setQuantity(artwork.getQuantity());
-        
-        if (artwork.getImageUrls() != null) {
-            response.setImageUrls(new java.util.ArrayList<>(artwork.getImageUrls()));
+
+        if (artwork.getImagesUrls() != null) {
+            response.setImageUrls(new java.util.ArrayList<>(artwork.getImagesUrls()));
         }
         
         response.setPrice(artwork.getPrice());
