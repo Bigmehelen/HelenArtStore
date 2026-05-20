@@ -98,7 +98,7 @@ public class ArtworkServiceImplTest {
         savedArtwork.setQuantity(3);
         savedArtwork.setAvailable(true);
         savedArtwork.setPrice(BigDecimal.valueOf(4000));
-        savedArtwork.setImageUrls(List.of("url1", "url2"));
+        savedArtwork.setImagesUrls(List.of("url1", "url2"));
         savedArtwork.setArtist(artistUser);
 
         ArtworkResponse response = new ArtworkResponse();
