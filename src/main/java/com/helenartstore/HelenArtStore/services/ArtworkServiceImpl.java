@@ -39,7 +39,9 @@ public class ArtworkServiceImpl implements ArtworkService {
             for (MultipartFile image : request.getImagesUrls()) {
                 if (!image.isEmpty()) {
                     String imageUrl = cloudinaryService.uploadImage(image);
-                    imageUrls.add(imageUrl);
+                    if (imageUrl != null && !imageUrl.isBlank()) {
+                        imageUrls.add(imageUrl);
+                    }
                 }
             }
         }
@@ -89,7 +91,7 @@ public class ArtworkServiceImpl implements ArtworkService {
     @Override
     @Transactional(readOnly = true)
     public ArtworkResponse getArtworkById(@org.springframework.lang.NonNull Long id) {
-        Artworks artwork = findArtworkById(id); 
+        Artworks artwork = findArtworkById(id);
         return artworkMapper.toResponse(artwork);
     }
 
@@ -114,8 +116,9 @@ public class ArtworkServiceImpl implements ArtworkService {
     public void updateArtworkImages(Artworks artwork, List<MultipartFile> images) {
         if (images != null && !images.isEmpty()) {
             List<String> imageUrls = images.stream()
-                    .filter(file -> !file.isEmpty())
+                    .filter(file -> file != null && !file.isEmpty())
                     .map(cloudinaryService::uploadImage)
+                    .filter(url -> url != null && !url.isBlank())
                     .collect(Collectors.toList());
             if (!imageUrls.isEmpty()) {
                 artwork.setImagesUrls(imageUrls);
